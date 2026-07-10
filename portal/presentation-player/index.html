@@ -1,0 +1,300 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Harness 簡報播放器 — 展示沙盒</title>
+  <link rel="stylesheet" href="/raw?path=portal/presentation-player/presentation-player.css">
+  <style>
+    :root {
+      --bg-gradient: radial-gradient(circle at top right, #1e1b4b 0%, #0f172a 100%);
+      --panel-bg: rgba(30, 41, 59, 0.4);
+      --border-color: rgba(255, 255, 255, 0.08);
+    }
+
+    body {
+      margin: 0;
+      padding: 0;
+      min-height: 100vh;
+      background: var(--bg-gradient);
+      color: #f8fafc;
+      font-family: 'Inter', system-ui, -apple-system, sans-serif;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      box-sizing: border-box;
+    }
+
+    header {
+      width: 100%;
+      max-width: 1200px;
+      padding: 30px 20px 10px 20px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      box-sizing: border-box;
+    }
+
+    h1.app-title {
+      font-size: 1.5rem;
+      margin: 0;
+      background: linear-gradient(135deg, #a5b4fc 0%, #6366f1 100%);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      font-weight: 700;
+    }
+
+    .badge {
+      background: rgba(99, 102, 241, 0.15);
+      border: 1px solid rgba(99, 102, 241, 0.3);
+      color: #a5b4fc;
+      padding: 4px 12px;
+      border-radius: 9999px;
+      font-size: 0.75rem;
+      font-weight: 600;
+      letter-spacing: 0.05em;
+    }
+
+    main {
+      flex: 1;
+      width: 100%;
+      max-width: 1200px;
+      display: grid;
+      grid-template-columns: 1fr;
+      gap: 30px;
+      padding: 20px;
+      box-sizing: border-box;
+    }
+
+    /* 寬螢幕時，簡報播放器居左，控制面版居右 */
+    @media (min-width: 968px) {
+      main {
+        grid-template-columns: 3fr 1.2fr;
+      }
+    }
+
+    .player-section {
+      display: flex;
+      flex-direction: column;
+      gap: 15px;
+    }
+
+    .sidebar-section {
+      display: flex;
+      flex-direction: column;
+      gap: 20px;
+    }
+
+    /* 控制面板與講稿區 */
+    .card {
+      background: var(--panel-bg);
+      border: 1px solid var(--border-color);
+      border-radius: 16px;
+      padding: 24px;
+      backdrop-filter: blur(12px);
+      -webkit-backdrop-filter: blur(12px);
+      box-sizing: border-box;
+    }
+
+    .card-title {
+      font-size: 1rem;
+      font-weight: 600;
+      margin-top: 0;
+      margin-bottom: 16px;
+      color: #94a3b8;
+      text-transform: uppercase;
+      letter-spacing: 0.05em;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+
+    /* 講稿區 */
+    #notes-content {
+      font-size: 1rem;
+      line-height: 1.6;
+      color: #e2e8f0;
+      min-height: 100px;
+      max-height: 250px;
+      overflow-y: auto;
+      white-space: pre-wrap;
+      transition: opacity 0.2s ease;
+    }
+
+    /* 投影片大綱導覽 */
+    .outline-list {
+      list-style: none;
+      padding: 0;
+      margin: 0;
+      max-height: 250px;
+      overflow-y: auto;
+    }
+
+    .outline-item {
+      padding: 10px 14px;
+      border-radius: 8px;
+      cursor: pointer;
+      font-size: 0.925rem;
+      color: #94a3b8;
+      transition: all 0.2s ease;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      margin-bottom: 6px;
+      border: 1px solid transparent;
+    }
+
+    .outline-item:hover {
+      background: rgba(255, 255, 255, 0.03);
+      color: #f8fafc;
+    }
+
+    .outline-item.is-active {
+      background: rgba(99, 102, 241, 0.1);
+      border-color: rgba(99, 102, 241, 0.2);
+      color: #a5b4fc;
+      font-weight: 500;
+    }
+
+    .outline-index {
+      font-size: 0.75rem;
+      opacity: 0.6;
+    }
+
+    footer {
+      width: 100%;
+      text-align: center;
+      padding: 30px 20px;
+      color: #475569;
+      font-size: 0.875rem;
+      box-sizing: border-box;
+      border-top: 1px solid rgba(255, 255, 255, 0.03);
+      margin-top: 40px;
+    }
+
+    footer a {
+      color: #6366f1;
+      text-decoration: none;
+    }
+
+    footer a:hover {
+      text-decoration: underline;
+    }
+  </style>
+</head>
+<body>
+
+  <header>
+    <div style="display: flex; align-items: center; gap: 12px;">
+      <h1 class="app-title">Harness Presentation Framework</h1>
+      <span class="badge">V1.0 BONE</span>
+    </div>
+    <div style="font-size: 0.875rem; color: #64748b;">
+      Sandbox Environment
+    </div>
+  </header>
+
+  <main>
+    <!-- 左側：簡報播放器 -->
+    <div class="player-section">
+      <!-- 簡報播放器載入容器 -->
+      <div id="presentation-container"></div>
+    </div>
+
+    <!-- 右側：大綱與講稿 (整合測試) -->
+    <div class="sidebar-section">
+      <!-- 當前講稿 -->
+      <div class="card">
+        <h3 class="card-title">
+          <span>🎙️</span> 講師講稿 (Slide Notes)
+        </h3>
+        <div id="notes-content">正在初始化播放器...</div>
+      </div>
+
+      <!-- 投影片大綱 -->
+      <div class="card">
+        <h3 class="card-title">
+          <span>📋</span> 簡報大綱 (Outline)
+        </h3>
+        <ul id="outline-container" class="outline-list">
+          <!-- 動態生成 -->
+        </ul>
+      </div>
+    </div>
+  </main>
+
+  <footer>
+    Harness Presentation Framework &copy; 2026. Designed for Hana self-healing portal.
+  </footer>
+
+  <!-- 引入播放器核心程式 -->
+  <script src="/raw?path=portal/presentation-player/presentation-player.js"></script>
+  <script>
+    document.addEventListener('DOMContentLoaded', () => {
+      // 1. 取得 DOM 參照
+      const container = document.getElementById('presentation-container');
+      const notesContent = document.getElementById('notes-content');
+      const outlineContainer = document.getElementById('outline-container');
+
+      // 2. 初始化 PresentationPlayer 實例
+      const player = new PresentationPlayer({
+        container: container,
+        aspectRatio: '16/9'
+      });
+
+      // 3. 註冊事件監聽
+
+      // 當簡報載入完成時，動態建立側邊欄大綱選單
+      player.on('load', (data) => {
+        outlineContainer.innerHTML = '';
+        data.slides.forEach((slide, index) => {
+          const li = document.createElement('li');
+          li.className = 'outline-item';
+          li.innerHTML = `
+            <span>${slide.title}</span>
+            <span class="outline-index">Page ${index + 1}</span>
+          `;
+          li.addEventListener('click', () => {
+            player.goTo(index);
+          });
+          outlineContainer.appendChild(li);
+        });
+      });
+
+      // 當投影片換頁時，更新講稿內容與大綱的高亮狀態
+      player.on('slidechange', (data) => {
+        // 更新講稿
+        if (data.slide.notes) {
+          notesContent.style.opacity = '0.3';
+          setTimeout(() => {
+            notesContent.innerText = data.slide.notes;
+            notesContent.style.opacity = '1';
+          }, 100);
+        } else {
+          notesContent.innerHTML = '<em>本頁無講稿</em>';
+        }
+
+        // 更新大綱高亮
+        const items = outlineContainer.querySelectorAll('.outline-item');
+        items.forEach((item, index) => {
+          if (index === data.index) {
+            item.classList.add('is-active');
+            // 自動滾動大綱視窗
+            item.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+          } else {
+            item.classList.remove('is-active');
+          }
+        });
+      });
+
+      player.on('error', (err) => {
+        notesContent.innerHTML = `<span style="color: #ef4444;">載入簡報錯誤: ${err.message}</span>`;
+      });
+
+      // 4. 開始載入簡報
+      // 讀取同目錄下的 demo-presentation.html
+      player.loadFromUrl('/raw?path=portal/presentation-player/demo-presentation.html');
+    });
+  </script>
+</body>
+</html>

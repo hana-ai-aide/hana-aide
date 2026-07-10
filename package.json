@@ -1,0 +1,9 @@
+{
+  "name": "harness",
+  "version": "0.1.0",
+  "private": true,
+  "description": "Local AI-agent workspace harness. Phase 1: docgraph — a markdown governance/spec knowledge graph (sibling to codegraph).",
+  "scripts": {
+    "docgraph": "node --experimental-sqlite --no-warnings docgraph/cli.js"
+  }
+}

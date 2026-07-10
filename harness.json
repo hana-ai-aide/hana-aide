@@ -1,0 +1,11 @@
+{
+  "name": "Hana",
+  "subtitle": "AI 特助 · Hana 的家",
+  "sidebar": {
+    "sections": [
+      { "label": "Hana 自我介紹", "icon": "presentation", "path": "presentations-v3", "filter": "*.html" },
+      { "label": "全域記憶 (USER / AGENT)", "icon": "brain", "path": "global-knowledge", "filter": "*.md" },
+      { "label": "專案記憶 (MEMORY / PERSONA)", "icon": "folder-heart", "path": ".harness/knowledge", "filter": "*.md" }
+    ]
+  }
+}

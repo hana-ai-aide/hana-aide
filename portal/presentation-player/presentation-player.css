@@ -1,0 +1,252 @@
+/**
+ * PresentationPlayer Styling
+ * 
+ * 採用 CSS 變數設計，易於客製化與主題抽換。
+ * 支援 16:9 標準比例舞台、投影片淡入淡出與水平定位、全螢幕適應，以及現代感控制列。
+ */
+
+:root {
+  /* 基礎色盤 (可被外部覆寫) */
+  --pres-bg: #0f172a;               /* 播放器背景深色 (Slate 900) */
+  --pres-slide-bg: #1e293b;         /* 投影片預設背景 (Slate 800) */
+  --pres-text-color: #f8fafc;       /* 投影片預設文字顏色 (Slate 50) */
+  --pres-accent-color: #6366f1;     /* 點綴色 (Indigo 500) */
+  --pres-accent-hover: #4f46e5;     /* 點綴色 Hover */
+  --pres-control-bg: rgba(30, 41, 59, 0.85); /* 控制列背景 (毛玻璃) */
+  --pres-control-btn-color: #94a3b8; /* 控制列按鈕顏色 (Slate 400) */
+  --pres-control-btn-hover: #f8fafc; /* 控制列按鈕 Hover 顏色 */
+  --pres-transition-speed: 0.4s;    /* 轉場速度 */
+}
+
+/* 播放器容器 */
+.pres-player-container {
+  width: 100%;
+  max-width: none;
+  margin: 0 auto;
+  box-sizing: border-box;
+}
+
+/* 播放器包裝 (決定比例，全螢幕時會變更樣式) */
+.pres-player-wrapper {
+  position: relative;
+  width: 100%;
+  height: 100%;
+  background-color: var(--pres-bg);
+  border-radius: 12px;
+  overflow: hidden;
+  box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.3), 0 8px 10px -6px rgba(0, 0, 0, 0.3);
+  display: flex;
+  flex-direction: column;
+  box-sizing: border-box;
+  font-family: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+}
+
+/* 播放舞台 */
+.pres-player-stage {
+  position: relative;
+  flex: 1;
+  width: 100%;
+  height: 100%;
+  overflow: hidden;
+}
+
+/* 單張投影片基礎樣式 */
+.pres-slide {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background-color: var(--pres-slide-bg);
+  color: var(--pres-text-color);
+  box-sizing: border-box;
+  padding: 40px;
+  opacity: 0;
+  visibility: hidden;
+  transition: opacity var(--pres-transition-speed) ease,
+              transform var(--pres-transition-speed) ease,
+              visibility var(--pres-transition-speed);
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  text-align: center;
+}
+
+/* 轉場動畫樣式：橫向滑動與淡入淡出結合 */
+.pres-slide.is-active {
+  opacity: 1;
+  visibility: visible;
+  transform: translateX(0);
+  z-index: 10;
+}
+
+.pres-slide.is-prev {
+  opacity: 0;
+  visibility: hidden;
+  transform: translateX(-30px);
+  z-index: 1;
+}
+
+.pres-slide.is-next {
+  opacity: 0;
+  visibility: hidden;
+  transform: translateX(30px);
+  z-index: 1;
+}
+
+/* 隱藏未啟用的投影片，節省瀏覽器渲染開銷 */
+.pres-slide.is-hidden {
+  display: none !important;
+}
+
+/* 投影片預設內容排版 */
+.pres-slide h1, 
+.pres-slide h2, 
+.pres-slide h3 {
+  margin-top: 0;
+  color: #ffffff;
+  font-weight: 700;
+  letter-spacing: -0.025em;
+}
+
+.pres-slide h1 {
+  font-size: 2.5rem;
+  margin-bottom: 20px;
+}
+
+.pres-slide h2 {
+  font-size: 2rem;
+  margin-bottom: 15px;
+}
+
+.pres-slide p,
+.pres-slide li {
+  font-size: 1.25rem;
+  line-height: 1.6;
+  color: #cbd5e1; /* Slate 300 */
+}
+
+.pres-slide ul,
+.pres-slide ol {
+  text-align: left;
+  display: inline-block;
+  margin: 10px 0;
+}
+
+/* 控制列 */
+.pres-player-controls {
+  position: absolute;
+  bottom: 20px;
+  left: 50%;
+  transform: translateX(-50%);
+  display: flex;
+  align-items: center;
+  gap: 15px;
+  background-color: var(--pres-control-bg);
+  backdrop-filter: blur(8px);
+  -webkit-backdrop-filter: blur(8px);
+  padding: 8px 16px;
+  border-radius: 9999px;
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  z-index: 100;
+  transition: opacity 0.3s ease;
+  box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -2px rgba(0, 0, 0, 0.1);
+}
+
+/* 當滑鼠移開播放器時，可以將控制列微淡化 (選用) */
+.pres-player-wrapper:not(:hover) .pres-player-controls {
+  opacity: 0.4;
+}
+.pres-player-controls:hover {
+  opacity: 1 !important;
+}
+
+/* 控制按鈕 */
+.pres-btn {
+  background: none;
+  border: none;
+  color: var(--pres-control-btn-color);
+  font-size: 1.5rem;
+  cursor: pointer;
+  width: 32px;
+  height: 32px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 50%;
+  transition: background-color 0.2s ease, color 0.2s ease;
+}
+
+.pres-btn:hover:not(:disabled) {
+  background-color: rgba(255, 255, 255, 0.1);
+  color: var(--pres-control-btn-hover);
+}
+
+.pres-btn:disabled {
+  opacity: 0.3;
+  cursor: not-allowed;
+}
+
+.pres-btn.pres-fullscreen {
+  font-size: 1.1rem;
+}
+
+/* 頁數指示器 */
+.pres-indicator {
+  color: #94a3b8;
+  font-size: 0.875rem;
+  font-weight: 500;
+  min-width: 50px;
+  text-align: center;
+  user-select: none;
+}
+
+/* 進度條 */
+.pres-progress-bar {
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  width: 100%;
+  height: 4px;
+  background-color: rgba(255, 255, 255, 0.1);
+  z-index: 101;
+}
+
+.pres-progress-fill {
+  height: 100%;
+  width: 0%;
+  background-color: var(--pres-accent-color);
+  transition: width 0.3s ease;
+}
+
+/* 全螢幕模式樣式覆寫 */
+.pres-player-wrapper.is-fullscreen {
+  width: 100vw !important;
+  height: 100vh !important;
+  aspect-ratio: auto !important;
+  border-radius: 0;
+}
+
+.pres-player-wrapper.is-fullscreen .pres-slide {
+  padding: 80px;
+}
+
+.pres-player-wrapper.is-fullscreen .pres-slide h1 {
+  font-size: 4rem;
+}
+
+.pres-player-wrapper.is-fullscreen .pres-slide h2 {
+  font-size: 3rem;
+}
+
+.pres-player-wrapper.is-fullscreen .pres-slide p,
+.pres-player-wrapper.is-fullscreen .pres-slide li {
+  font-size: 1.75rem;
+}
+
+/* 全螢幕下沒 hover 播放器時隱藏控制列 */
+.pres-player-wrapper.is-fullscreen:not(:hover) .pres-player-controls {
+  opacity: 0;
+  pointer-events: none;
+}

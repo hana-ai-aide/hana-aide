@@ -1,0 +1,62 @@
+<!--
+  Demo Presentation for PresentationPlayer
+  
+  格式規範：
+  1. 投影片元素必須帶有 `class="slide"`。
+  2. 支援 `id` 屬性（選填），若無則由播放器自動產生。
+  3. `data-title` 屬性（選填）：定義該頁標題，可用於縮圖或大綱導覽。
+  4. `data-notes` 屬性（選填）：定義該頁講稿，可用於 TTS 語音合成播放或呈現給講師看。
+-->
+
+<section class="slide" data-title="首頁" data-notes="各位好，歡迎參加本次的 Harness 簡報播放器發布會。今天我將為大家介紹這套極簡且易於整合的簡報播放模組。">
+  <div class="slide-content">
+    <h1>Harness 簡報播放模組</h1>
+    <p style="color: var(--pres-accent-color); font-weight: 600; margin-top: -10px;">獨立自包含的播放骨架</p>
+    <div style="margin-top: 30px; font-size: 1rem; color: #64748b;">
+      使用左右方向鍵或空白鍵切換 <br>
+      點擊右下角按鈕切換全螢幕
+    </div>
+  </div>
+</section>
+
+<section class="slide" data-title="核心設計" data-notes="這套播放器採用了四大核心設計原則：無依賴、CSS變數、事件驅動、以及獨立可複製。這使得任何專案都能在數秒內整合這套簡報播放功能。">
+  <div class="slide-content">
+    <h2>核心設計原則</h2>
+    <ul style="max-width: 500px; margin: 0 auto; text-align: left;">
+      <li><strong>💪 獨立無依賴</strong>：採用原生 Vanilla JS，不需 React / Vue 或 Webpack。</li>
+      <li><strong>🎨 CSS 變數</strong>：顏色與字體全部由 CSS 變數控制，客製化非常簡單。</li>
+      <li><strong>⚡ 事件驅動</strong>：內建豐富的事件掛鉤 (slideChange, load, ended)。</li>
+      <li><strong>📦 獨立可複製</strong>：放在一個資料夾中，直接複製即可在其他專案運作。</li>
+    </ul>
+  </div>
+</section>
+
+<section class="slide" data-title="進階擴充" data-notes="雖然目前是骨架，但因為事件機制的完整設計，之後可以很容易擴充像是語音合成朗讀講稿，或者是加入 AI 虛擬人頭像的互動，讓投影片能動態說話。">
+  <div class="slide-content">
+    <h2>未來擴充方向</h2>
+    <p>透過監聽 <code>slideChange</code> 事件，容易與其他模組整合：</p>
+    <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 20px; max-width: 600px; margin: 20px auto; text-align: left;">
+      <div style="background: rgba(255,255,255,0.05); padding: 15px; border-radius: 8px; border: 1px solid rgba(255,255,255,0.05);">
+        <h4 style="margin: 0 0 8px 0; color: var(--pres-accent-color);">🎙️ 語音導覽 (TTS)</h4>
+        <span style="font-size: 0.9rem; color: #94a3b8;">讀取 <code>data-notes</code> 並呼叫 Web Speech API 進行朗讀。</span>
+      </div>
+      <div style="background: rgba(255,255,255,0.05); padding: 15px; border-radius: 8px; border: 1px solid rgba(255,255,255,0.05);">
+        <h4 style="margin: 0 0 8px 0; color: var(--pres-accent-color);">🤖 虛擬頭像 (Avatar)</h4>
+        <span style="font-size: 0.9rem; color: #94a3b8;">結合 Hana 頭像部件，在換頁時變換表情或播放嘴型動畫。</span>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section class="slide" data-title="複製步驟" data-notes="最後，關於如何複製這套模組。你只需要複製這整個 presentation-player 目錄，然後引入 JS 與 CSS，再初始化 PresentationPlayer 類別即可。">
+  <div class="slide-content">
+    <h2>如何複製本模組？</h2>
+    <ol style="max-width: 600px; margin: 0 auto; text-align: left; font-size: 1.1rem; line-height: 1.8;">
+      <li>複製 <code>portal/presentation-player/</code> 目錄到你的專案中。</li>
+      <li>在 HTML 引入 <code>presentation-player.css</code> 與 <code>presentation-player.js</code>。</li>
+      <li>在你的 HTML 建立一個播放器的掛載容器 <code>&lt;div id="player"&gt;&lt;/div&gt;</code>。</li>
+      <li>使用 JavaScript 初始化：<code>const player = new PresentationPlayer({ container: document.getElementById('player') });</code></li>
+      <li>呼叫 <code>player.loadFromUrl('your-slide.html')</code>。</li>
+    </ol>
+  </div>
+</section>

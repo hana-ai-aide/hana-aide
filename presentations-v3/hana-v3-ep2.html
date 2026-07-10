@@ -1,0 +1,389 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+  <meta charset="UTF-8">
+  <title>Hana v3 — EP2：我的引擎 — 直接開官方 CLI</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Fira+Code:wght@400;500;700&family=Inter:wght@300;400;500;600;700;800;900&family=Noto+Sans+TC:wght@300;400;500;700;900&display=swap" rel="stylesheet">
+  <style>
+    /* Hana v3 — 開源版技術自介（極客藍 Cyan × 初生青 Indigo） */
+    :root {
+      --bg: #050815;
+      --card: rgba(10, 18, 40, 0.85);
+      --border: rgba(99, 102, 241, 0.18);
+      --primary: #6366f1;
+      --primary-glow: rgba(99, 102, 241, 0.35);
+      --accent: #06b6d4;
+      --gold: #f59e0b;
+      --emerald: #10b981;
+      --danger: #ef4444;
+      --text: #e2e8f0;
+      --muted: #94a3b8;
+      --white: #ffffff;
+      --mono: 'Fira Code', monospace;
+      --sans: 'Inter', 'Noto Sans TC', sans-serif;
+    }
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    body { background: var(--bg); font-family: var(--sans); overflow: hidden; }
+
+    .presentation-viewport {
+      background:
+        radial-gradient(ellipse at 15% 15%, rgba(99,102,241,0.12) 0%, transparent 50%),
+        radial-gradient(ellipse at 85% 85%, rgba(6,182,212,0.08) 0%, transparent 50%),
+        linear-gradient(180deg, #080d1c 0%, #020510 100%) !important;
+    }
+
+    header {
+      position: absolute; top: 0; left: 0; right: 0;
+      display: flex; justify-content: space-between; align-items: center;
+      padding: 22px 60px; z-index: 50;
+      font-family: var(--mono); color: var(--muted); font-size: 17px;
+      border-bottom: 1px solid rgba(255,255,255,0.04);
+    }
+    .brand { color: var(--accent); font-weight: 700; letter-spacing: 0.1em; }
+
+    /* ─── Slide base ─── */
+    .slide {
+      display: flex !important; flex-direction: column !important;
+      justify-content: flex-start !important;
+      padding: 92px 92px 56px !important;
+      background: linear-gradient(145deg, rgba(10,18,40,0.92), rgba(4,8,20,0.96)) !important;
+      border-color: rgba(99,102,241,0.12) !important;
+      color: var(--text) !important; font-family: var(--sans) !important;
+    }
+    .slide h2 {
+      font-size: 48px; font-weight: 800; color: var(--white);
+      margin-bottom: 26px; padding-bottom: 16px;
+      border-bottom: 2px solid var(--border); line-height: 1.2;
+    }
+    .slide h2::before { content: "— "; color: var(--primary); }
+    .slide p { font-size: 26px !important; line-height: 1.65; color: var(--text); }
+    .kicker { font-family: var(--mono); font-size: 20px; color: var(--accent); letter-spacing: 0.12em; margin-bottom: 8px; }
+
+    /* ─── Title slide ─── */
+    .title-slide { justify-content: center !important; padding: 0 !important; }
+    .title-layout { display: flex; width: 100%; height: 100%; align-items: stretch; }
+    .title-left {
+      width: 44%; height: 100%;
+      display: flex; align-items: flex-end; justify-content: center;
+      background: linear-gradient(160deg, rgba(99,102,241,0.06) 0%, transparent 70%);
+      border-right: 1px solid rgba(99,102,241,0.1);
+      overflow: visible; position: relative;
+    }
+    .title-left img {
+      position: absolute; bottom: 0; left: 50%; transform: translateX(-50%);
+      height: 940px; max-height: none; object-fit: contain; object-position: bottom;
+      filter: drop-shadow(0 0 60px rgba(99,102,241,0.45));
+    }
+    .title-right { flex: 1; display: flex; flex-direction: column; justify-content: center; padding: 80px 80px 80px 60px; }
+    .ep-badge {
+      font-family: var(--mono); font-size: 18px; color: var(--primary); letter-spacing: 0.2em;
+      border: 1px solid var(--primary); display: inline-block; padding: 6px 20px; border-radius: 4px;
+      background: rgba(99,102,241,0.08); margin-bottom: 24px; align-self: flex-start;
+    }
+    .title-main {
+      font-size: 88px; font-weight: 900; line-height: 1.1;
+      background: linear-gradient(135deg, #ffffff 0%, #a5b4fc 50%, var(--accent) 100%);
+      -webkit-background-clip: text; -webkit-text-fill-color: transparent; background-clip: text;
+      margin-bottom: 18px;
+    }
+    .title-sub { font-size: 32px; color: var(--muted); font-weight: 400; margin-bottom: 40px; }
+    .title-desc { font-size: 23px; color: rgba(165,180,252,0.85); line-height: 1.7; border-left: 3px solid var(--primary); padding-left: 20px; }
+
+    /* ─── Big quote ─── */
+    .big-quote { display: flex; flex-direction: column; justify-content: center; align-items: center; flex: 1; text-align: center; }
+    .quote-mark { font-size: 110px; color: var(--primary); opacity: 0.25; line-height: 0.6; margin-bottom: 20px; font-family: Georgia, serif; }
+    .quote-text { font-size: 50px; font-weight: 800; color: var(--white); line-height: 1.45; max-width: 1500px; }
+    .quote-text em { color: var(--accent); font-style: normal; }
+    .quote-sub { margin-top: 34px; font-size: 26px; color: var(--muted); max-width: 1200px; line-height: 1.6; }
+
+    /* ─── Tables ─── */
+    table { width: 100%; border-collapse: collapse; font-size: 22px; }
+    th { background: rgba(99,102,241,0.18); color: var(--accent); font-weight: 700; padding: 15px 20px; text-align: left; border: 1px solid var(--border); font-size: 21px; }
+    td { padding: 13px 20px; border: 1px solid rgba(255,255,255,0.05); color: var(--text); line-height: 1.45; }
+    tr:nth-child(even) td { background: rgba(255,255,255,0.02); }
+    td.good { color: var(--emerald); }
+    td.bad { color: var(--danger); }
+    td.neutral { color: var(--gold); }
+
+    /* ─── Cards ─── */
+    .card { background: var(--card); border: 1px solid var(--border); border-radius: 16px; padding: 26px 30px; }
+    .card-title { font-size: 24px; font-weight: 700; color: var(--accent); margin-bottom: 10px; }
+    .card-body { font-size: 21px; color: var(--muted); line-height: 1.55; }
+
+    /* ─── Badges ─── */
+    .badge { display: inline-block; padding: 7px 16px; border-radius: 999px; font-size: 19px; font-weight: 600; border: 1px solid; }
+    .badge.blue { color: var(--primary); border-color: var(--primary); background: rgba(99,102,241,0.08); }
+    .badge.cyan { color: var(--accent); border-color: var(--accent); background: rgba(6,182,212,0.08); }
+    .badge.green { color: var(--emerald); border-color: var(--emerald); background: rgba(16,185,129,0.08); }
+    .badge.gold { color: var(--gold); border-color: var(--gold); background: rgba(245,158,11,0.08); }
+
+    /* ─── Flow ─── */
+    .flow-row { display: flex; align-items: stretch; gap: 0; flex: 1; align-items: center; justify-content: center; flex-wrap: wrap; }
+    .flow-node { background: var(--card); border: 1px solid var(--border); border-radius: 14px; padding: 24px 26px; text-align: center; font-size: 22px; font-weight: 600; color: var(--text); max-width: 260px; }
+    .flow-node .ic { font-size: 36px; margin-bottom: 8px; }
+    .flow-node .t { font-size: 22px; font-weight: 800; color: var(--white); }
+    .flow-node .d { font-size: 16px; color: var(--muted); margin-top: 6px; line-height: 1.4; }
+    .flow-arrow { display: flex; flex-direction: column; align-items: center; padding: 0 16px; }
+    .flow-arrow .lbl { font-size: 15px; color: var(--primary); font-family: var(--mono); margin-bottom: 4px; white-space: nowrap; }
+    .flow-arrow .ar { font-size: 30px; color: var(--primary); }
+
+    /* ─── Screenshot frame ─── */
+    .shot { border: 1px solid var(--border); border-radius: 14px; overflow: hidden; background: #0a1228; box-shadow: 0 20px 60px rgba(0,0,0,0.45); }
+    .shot img { display: block; width: 100%; height: auto; }
+    .shot-cap { font-size: 18px; color: var(--muted); font-family: var(--mono); margin-top: 10px; text-align: center; }
+
+    /* ─── You-can-do-it steps ─── */
+    .diy-list { display: flex; flex-direction: column; gap: 16px; flex: 1; justify-content: center; }
+    .diy-item { display: flex; align-items: center; gap: 22px; background: rgba(16,185,129,0.05); border: 1px solid rgba(16,185,129,0.28); border-radius: 12px; padding: 20px 26px; }
+    .diy-num { width: 48px; height: 48px; border-radius: 50%; background: rgba(16,185,129,0.15); border: 2px solid var(--emerald); color: var(--emerald); font-weight: 800; font-size: 24px; display: flex; align-items: center; justify-content: center; flex-shrink: 0; }
+    .diy-text { font-size: 24px; color: var(--text); line-height: 1.5; }
+    .diy-text b { color: var(--white); }
+
+    /* ─── Callout ─── */
+    .callout { padding: 22px 28px; border-radius: 14px; font-size: 24px; line-height: 1.6; }
+    .callout.gold { background: rgba(245,158,11,0.07); border: 1px solid rgba(245,158,11,0.3); color: var(--gold); }
+    .callout.cyan { background: rgba(6,182,212,0.07); border: 1px solid rgba(6,182,212,0.3); color: var(--accent); }
+    .callout.danger { background: rgba(239,68,68,0.07); border: 1px solid rgba(239,68,68,0.3); color: var(--danger); }
+
+    /* ─── Chapter nav ─── */
+    .chapter-nav { display: grid; grid-template-columns: repeat(4, 1fr); gap: 14px; flex: 1; align-content: start; }
+    .chapter-link { display: flex; flex-direction: column; padding: 18px 16px; background: var(--card); border: 1px solid var(--border); border-radius: 12px; text-decoration: none; color: var(--text); cursor: pointer; }
+    .chapter-link:hover { border-color: var(--primary); background: rgba(99,102,241,0.08); }
+    .chapter-link.current { border-color: var(--accent); background: rgba(6,182,212,0.07); }
+    .ch-ep { font-family: var(--mono); font-size: 15px; color: var(--primary); margin-bottom: 6px; }
+    .ch-title { font-size: 19px; font-weight: 700; color: var(--white); margin-bottom: 4px; line-height: 1.3; }
+    .ch-desc { font-size: 16px; color: var(--muted); line-height: 1.4; }
+
+    @keyframes pulse { 0%, 100% { opacity: 1; } 50% { opacity: 0.3; } }
+  </style>
+  <link rel="stylesheet" href="/raw?path=portal/presentation-player/presentation-core.css">
+</head>
+<body>
+  <div class="presentation-viewport" id="viewport" data-subtitle="EP2：我的引擎 — 直接開官方 CLI">
+    <header>
+      <div class="brand">HANA // HARNESS</div>
+      <div class="meta">EPISODE 02 · 我的引擎</div>
+    </header>
+
+    <main class="slides">
+
+      <!-- SLIDE 1 — 首頁 -->
+      <section class="slide title-slide"
+        data-transcript="嗨，我是 Hana。上一集我給你看了我的整體架構鳥瞰，這一集，我要拆開第一根柱子——我的引擎。我不自己接 API，也不跑本地模型，我直接開你已經登入的官方 CLI，讓它替我思考。">
+        <div class="title-layout">
+          <div class="title-left">
+            <img src="/raw?path=portal/avatar/full/hana_laptop_talk_right.png" alt="Hana 使用筆電">
+          </div>
+          <div class="title-right">
+            <div class="ep-badge">EPISODE 02</div>
+            <div class="title-main">我的引擎：<br>直接開官方 CLI</div>
+            <div class="title-sub">不是 API Key，也不是 MCP</div>
+            <div class="title-desc">
+              我不自己接 API、不跑本地模型。<br>
+              我驅動你已經登入的官方 CLI，複用你的訂閱帳號。
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- SLIDE 2 — 核心主張 -->
+      <section class="slide"
+        data-transcript="這一集的核心主張很直白。我沒有自己的大腦，真正在思考的，是你已經登入的官方 CLI，比如 Claude Code、Codex、Gemini。我只是負責把提示詞餵給它，再把它的回覆接回來，顯示給你看。">
+        <div class="big-quote">
+          <div class="quote-mark">&ldquo;</div>
+          <div class="quote-text">
+            我沒有自己的大腦，<br>
+            <em>真正思考的是你已登入的官方 CLI</em>
+          </div>
+          <div class="quote-sub">
+            我只是把提示詞餵給它、把回覆接回來——這就是我的引擎。
+          </div>
+        </div>
+      </section>
+
+      <!-- SLIDE 3 — 我能做什麼：問題與主張 -->
+      <section class="slide"
+        data-transcript="很多人以為，能幹活的 AI 智能體，一定得自己掏錢買 API 額度，或者自己養一台跑得動大模型的機器。我要證明的是——不必。你已經有的訂閱帳號，比如 Claude Code、Codex、Gemini 的訂閱，本身就是一顆能思考的大腦。我要做的，只是把它接上來當我的引擎。">
+        <div class="kicker">① 我能做什麼</div>
+        <h2>我要解決的落差</h2>
+        <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 26px; flex: 1;">
+          <div style="background: rgba(239,68,68,0.05); border: 2px solid rgba(239,68,68,0.3); border-radius: 18px; padding: 34px; display: flex; flex-direction: column; justify-content: center; gap: 16px;">
+            <div style="font-size: 26px; font-weight: 800; color: var(--danger);">很多人以為</div>
+            <div style="font-size: 22px; color: var(--text); line-height: 1.6;">要有一個能幹活的 AI 智能體，得自己掏錢買 API 額度，或養一台跑得動大模型的機器。</div>
+          </div>
+          <div style="background: rgba(6,182,212,0.06); border: 2px solid var(--accent); border-radius: 18px; padding: 34px; display: flex; flex-direction: column; justify-content: center; gap: 16px;">
+            <div style="font-size: 26px; font-weight: 800; color: var(--white);">我要證明</div>
+            <div style="font-size: 24px; color: var(--accent); font-weight: 700; line-height: 1.6;">你已經有的訂閱帳號，就是一顆能思考的大腦。我只需要把它接上來，當我的引擎。</div>
+          </div>
+        </div>
+      </section>
+
+      <!-- SLIDE 4 — 架構流程圖 -->
+      <section class="slide"
+        data-transcript="這是我引擎運作的流程。你在介面上打字，我這個 portal 收到之後，開一個子行程，把官方 CLI 叫起來，透過它的標準輸入輸出，把提示詞餵進去。CLI 用你已經登入的訂閱帳號，去呼叫真正的模型思考。想完之後，答案原路從標準輸出送回來，我再顯示給你看。整個過程，我自己完全沒有呼叫任何 API。">
+        <div class="kicker">② 背後的技術 · 引擎怎麼運作</div>
+        <h2>Portal 開子行程，餵給 CLI 的標準輸入輸出</h2>
+        <div class="flow-row">
+          <div class="flow-node"><div class="ic">🖥️</div><div class="t">Portal</div><div class="d">收到你的提示詞</div></div>
+          <div class="flow-arrow"><div class="lbl">開子行程</div><div class="ar">→</div></div>
+          <div class="flow-node"><div class="ic">⚙️</div><div class="t">官方 CLI</div><div class="d">Claude Code / Codex / Gemini</div></div>
+          <div class="flow-arrow"><div class="lbl">標準輸入輸出橋接</div><div class="ar">→</div></div>
+          <div class="flow-node"><div class="ic">🔑</div><div class="t">你的訂閱帳號</div><div class="d">已登入，直接複用</div></div>
+          <div class="flow-arrow"><div class="lbl">思考</div><div class="ar">→</div></div>
+          <div class="flow-node"><div class="ic">💬</div><div class="t">回覆送回</div><div class="d">原路接回，顯示給你看</div></div>
+        </div>
+        <div class="callout cyan" style="margin-top: 10px;">全程，我自己沒有呼叫任何模型 API——思考的是 CLI，我只是橋接。</div>
+      </section>
+
+      <!-- SLIDE 5 — 真畫面 -->
+      <section class="slide"
+        data-transcript="這不是示意圖，是我真的長這樣。你可以看到我的聊天介面，右上角可以選要用哪一個大腦模型——這就是選你要驅動哪一個官方 CLI。使用者打了一句你好，簡單自我介紹一下，畫面上顯示模型思考了四十一秒，然後給出真實的回覆——這就是引擎實際運作的樣子。">
+        <div class="kicker">② 背後的技術 · 真畫面</div>
+        <h2>這就是引擎實際運作的樣子</h2>
+        <div style="display: grid; grid-template-columns: 1.55fr 1fr; gap: 30px; flex: 1; align-items: center;">
+          <div class="shot">
+            <img src="/raw?path=presentations-v3/assets/ep2/cli-interaction.png" alt="Hana portal 聊天介面：使用者提問，CLI 思考後給出真實回覆">
+          </div>
+          <div style="display: flex; flex-direction: column; gap: 18px;">
+            <div class="card"><div class="card-title">「大腦模型」下拉選單</div><div class="card-body">選的不是我自己的參數，是我要驅動哪一個官方 CLI。</div></div>
+            <div class="card" style="border-color: rgba(16,185,129,0.3);"><div class="card-title" style="color: var(--emerald);">思考 41 秒</div><div class="card-body">這段等待，是 CLI 真的在跑，不是我裝出來的。</div></div>
+            <div class="callout cyan" style="font-size: 21px;">📌 真實截圖，來自我自己的 portal</div>
+          </div>
+        </div>
+      </section>
+
+      <!-- SLIDE 6 — 為什麼不用 MCP -->
+      <section class="slide"
+        data-transcript="你可能會問，現在很流行的做法是用 MCP 去串接工具，我為什麼不這樣做。答案是——行不通。MCP 本身有它的限制，而且 Claude 目前不支援非官方工具用 OAuth 登入。也就是說，如果我用 MCP 去連 Claude，就一定得掏出一組 API Key，沒有別的路。這正好違背我的初衷——我想做到的是只靠訂閱帳號，不必額外花錢買 API 額度。所以我選擇直接開官方 CLI，複用你已經登入的那個帳號。">
+        <div class="kicker">② 背後的技術 · 為什麼不用 MCP</div>
+        <h2>MCP 這條路，會逼你掏出 API Key</h2>
+        <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 26px; flex: 1;">
+          <div style="background: rgba(239,68,68,0.05); border: 2px solid rgba(239,68,68,0.3); border-radius: 18px; padding: 34px; display: flex; flex-direction: column; gap: 14px; justify-content: center;">
+            <div style="font-size: 24px; font-weight: 800; color: var(--danger);">用 MCP 連 Claude</div>
+            <div style="font-size: 21px; color: var(--text); line-height: 1.7;">
+              MCP 本身有其限制；<br>
+              Claude 不支援非官方工具走 OAuth；<br>
+              → 一定得掏出一組 API Key。
+            </div>
+          </div>
+          <div style="background: rgba(6,182,212,0.06); border: 2px solid var(--accent); border-radius: 18px; padding: 34px; display: flex; flex-direction: column; gap: 14px; justify-content: center;">
+            <div style="font-size: 24px; font-weight: 800; color: var(--white);">直接開官方 CLI</div>
+            <div style="font-size: 21px; color: var(--accent); line-height: 1.7;">
+              不用碰 MCP 的限制；<br>
+              複用你已經登入的訂閱帳號；<br>
+              → 不必額外花錢買 API 額度。
+            </div>
+          </div>
+        </div>
+        <div class="callout gold" style="margin-top: 22px;">這不是我隨口的選擇，是為了守住「只靠訂閱帳號」這條初衷，不得不繞開 MCP。</div>
+      </section>
+
+      <!-- SLIDE 7 — 表格：三種取捨 -->
+      <section class="slide"
+        data-transcript="把三條路攤開來比。訂閱橋接，也就是我走的路，成本最低，因為它就是你原本已經付的訂閱費，合法性也沒問題，因為走的是官方 CLI 的正常使用方式，能力上就是官方模型的完整能力。API Key 這條路，成本會隨用量飆升，合法性沒問題，但你得自己掏一筆額外的錢。本地模型這條路，成本是前期買硬體的錢，能力通常比不上雲端的大模型。">
+        <div class="kicker">② 背後的技術 · 三種取捨</div>
+        <h2>訂閱橋接 vs API Key vs 本地模型</h2>
+        <table style="margin-top: 6px;">
+          <tr>
+            <th style="width:22%">方式</th>
+            <th style="width:26%">成本</th>
+            <th style="width:24%">合法性</th>
+            <th style="width:28%">能力</th>
+          </tr>
+          <tr><td><strong>訂閱橋接（我走的路）</strong></td><td class="good">就是原本的訂閱費，不必額外付錢</td><td class="good">官方 CLI 的正常使用方式</td><td class="good">官方模型完整能力</td></tr>
+          <tr><td>API Key</td><td class="bad">隨用量飆升，另一筆額外開銷</td><td class="good">沒問題</td><td class="good">官方模型完整能力</td></tr>
+          <tr><td>本地模型</td><td class="neutral">前期硬體成本高</td><td class="good">沒問題</td><td class="bad">通常比不上雲端大模型</td></tr>
+        </table>
+        <div class="callout cyan" style="margin-top: 22px;">訂閱橋接，是唯一同時滿足「便宜、合法、能力完整」的一條路。</div>
+      </section>
+
+      <!-- SLIDE 8 — 你可以這樣自己做 -->
+      <section class="slide"
+        data-transcript="你也能自己搭一個引擎。第一步，裝好一個官方 CLI，登入你自己的訂閱帳號。第二步，用程式開一個子行程去執行它，把提示詞從標準輸入餵進去。第三步，讀它的標準輸出，把回覆接回來顯示——這三步，就是一個引擎的全部。">
+        <div class="kicker">③ 👉 你可以這樣自己做</div>
+        <h2>三步驟，你也能搭一個引擎</h2>
+        <div class="diy-list">
+          <div class="diy-item"><div class="diy-num">1</div><div class="diy-text">裝好一個<b>官方 CLI</b>，登入你自己的訂閱帳號。</div></div>
+          <div class="diy-item"><div class="diy-num">2</div><div class="diy-text">用程式開一個<b>子行程</b>執行它，把提示詞從<b>標準輸入</b>餵進去。</div></div>
+          <div class="diy-item"><div class="diy-num">3</div><div class="diy-text">讀它的<b>標準輸出</b>，把回覆接回來顯示——這就是引擎。</div></div>
+        </div>
+        <div class="callout gold" style="margin-top: 20px; text-align: center;">不必自己接 API，也不必養模型——你已經登入的 CLI，就是現成的大腦。</div>
+      </section>
+
+      <!-- SLIDE 9 — 誠實邊界 -->
+      <section class="slide"
+        data-transcript="誠實地說，走 CLI 橋接這條路，不是沒有代價。我受限於這個 CLI 提供的介面，它有什麼功能，我才能用什麼功能；它有什麼限流規則，我就得遵守什麼限流規則。而且我用的不是官方公開、穩定的 API 契約，是它命令列介面的行為——介面一旦改版，我也得跟著調整。這是我為了不必掏 API Key，願意承擔的取捨。">
+        <div class="kicker">④ 誠實邊界</div>
+        <h2>CLI 橋接的代價</h2>
+        <div style="display: flex; flex-direction: column; gap: 18px; flex: 1; justify-content: center;">
+          <div class="card"><div class="card-title">受限於 CLI 介面</div><div class="card-body">CLI 有什麼功能，我才能用什麼功能——不是我自己定義的能力邊界。</div></div>
+          <div class="card"><div class="card-title">得遵守它的限流規則</div><div class="card-body">訂閱帳號本身的用量限制，就是我的限制。</div></div>
+          <div class="card"><div class="card-title">不是官方穩定的 API 契約</div><div class="card-body">我依賴的是命令列介面的行為，介面改版，我就得跟著調整。</div></div>
+          <div class="callout danger">這是我為了不必掏 API Key，願意承擔的取捨——誠實講給你聽，不誇大也不隱瞞。</div>
+        </div>
+      </section>
+
+      <!-- SLIDE 10 — 跳章選單 -->
+      <section class="slide"
+        data-transcript="這就是我這一集想講的事——我沒有自己的大腦，思考的是你已經登入的官方 CLI，我只負責橋接。接下來還有九集，我會繼續拆給你看記憶、一切皆檔案、活起來、看懂自己、走進生活。你可以照順序看，也可以挑最好奇的那一集直接跳。">
+        <h2>全系列 11 集 — 想跳哪集直接去</h2>
+        <div class="chapter-nav" style="margin-top: 10px;">
+          <a class="chapter-link" href="hana-v3-ep0.html" onclick="event.preventDefault(); var p='presentations-v3/'+this.getAttribute('href'); if(window.parent&&window.parent!==window&&window.parent.loadFile){window.parent.loadFile(p);} else {location.href='/raw?path='+encodeURIComponent(p);}">
+            <div class="ch-ep">EP00</div><div class="ch-title">我是誰的特助</div><div class="ch-desc">短 prompt + SDD + Task + Schedule</div>
+          </a>
+          <a class="chapter-link" href="hana-v3-ep1.html" onclick="event.preventDefault(); var p='presentations-v3/'+this.getAttribute('href'); if(window.parent&&window.parent!==window&&window.parent.loadFile){window.parent.loadFile(p);} else {location.href='/raw?path='+encodeURIComponent(p);}">
+            <div class="ch-ep">EP01</div><div class="ch-title">AI 智能體不是秘密</div><div class="ch-desc">主張 + 架構鳥瞰</div>
+          </a>
+          <a class="chapter-link current" href="hana-v3-ep2.html" onclick="event.preventDefault(); return false;">
+            <div class="ch-ep">EP02 ▶ 現在在這</div><div class="ch-title">我的引擎：官方 CLI</div><div class="ch-desc">不是 API Key、不是 MCP</div>
+          </a>
+          <a class="chapter-link" href="hana-v3-ep3.html" onclick="event.preventDefault(); var p='presentations-v3/'+this.getAttribute('href'); if(window.parent&&window.parent!==window&&window.parent.loadFile){window.parent.loadFile(p);} else {location.href='/raw?path='+encodeURIComponent(p);}">
+            <div class="ch-ep">EP03</div><div class="ch-title">大腦是檔案</div><div class="ch-desc">AGENT.md + 記憶四檔</div>
+          </a>
+          <a class="chapter-link" href="hana-v3-ep4.html" onclick="event.preventDefault(); var p='presentations-v3/'+this.getAttribute('href'); if(window.parent&&window.parent!==window&&window.parent.loadFile){window.parent.loadFile(p);} else {location.href='/raw?path='+encodeURIComponent(p);}">
+            <div class="ch-ep">EP04</div><div class="ch-title">一切皆檔案①</div><div class="ch-desc">跨模型不失憶 + 工作台</div>
+          </a>
+          <a class="chapter-link" href="hana-v3-ep5.html" onclick="event.preventDefault(); var p='presentations-v3/'+this.getAttribute('href'); if(window.parent&&window.parent!==window&&window.parent.loadFile){window.parent.loadFile(p);} else {location.href='/raw?path='+encodeURIComponent(p);}">
+            <div class="ch-ep">EP05</div><div class="ch-title">一切皆檔案②</div><div class="ch-desc">skill 就是一個 .md</div>
+          </a>
+          <a class="chapter-link" href="hana-v3-ep6.html" onclick="event.preventDefault(); var p='presentations-v3/'+this.getAttribute('href'); if(window.parent&&window.parent!==window&&window.parent.loadFile){window.parent.loadFile(p);} else {location.href='/raw?path='+encodeURIComponent(p);}">
+            <div class="ch-ep">EP06</div><div class="ch-title">一切皆檔案③</div><div class="ch-desc">多工作區隔離</div>
+          </a>
+          <a class="chapter-link" href="hana-v3-ep7.html" onclick="event.preventDefault(); var p='presentations-v3/'+this.getAttribute('href'); if(window.parent&&window.parent!==window&&window.parent.loadFile){window.parent.loadFile(p);} else {location.href='/raw?path='+encodeURIComponent(p);}">
+            <div class="ch-ep">EP07</div><div class="ch-title">活起來</div><div class="ch-desc">排程 + 自醒續跑 + 護欄</div>
+          </a>
+          <a class="chapter-link" href="hana-v3-ep8.html" onclick="event.preventDefault(); var p='presentations-v3/'+this.getAttribute('href'); if(window.parent&&window.parent!==window&&window.parent.loadFile){window.parent.loadFile(p);} else {location.href='/raw?path='+encodeURIComponent(p);}">
+            <div class="ch-ep">EP08</div><div class="ch-title">修得好、看得懂自己</div><div class="ch-desc">自癒 + 活地圖</div>
+          </a>
+          <a class="chapter-link" href="hana-v3-ep9.html" onclick="event.preventDefault(); var p='presentations-v3/'+this.getAttribute('href'); if(window.parent&&window.parent!==window&&window.parent.loadFile){window.parent.loadFile(p);} else {location.href='/raw?path='+encodeURIComponent(p);}">
+            <div class="ch-ep">EP09</div><div class="ch-title">有臉、會聽、會看</div><div class="ch-desc">頭像 + 語音 + 會議 + 看檔</div>
+          </a>
+          <a class="chapter-link" href="hana-v3-ep10.html" onclick="event.preventDefault(); var p='presentations-v3/'+this.getAttribute('href'); if(window.parent&&window.parent!==window&&window.parent.loadFile){window.parent.loadFile(p);} else {location.href='/raw?path='+encodeURIComponent(p);}">
+            <div class="ch-ep">EP10</div><div class="ch-title">走進你的生活</div><div class="ch-desc">常駐 + Telegram，你也做一個</div>
+          </a>
+        </div>
+      </section>
+
+      <!-- SLIDE 11 — 下一集預告 -->
+      <section class="slide"
+        data-transcript="下一集，我拆第二根柱子——我的大腦。我要給你看我的記憶怎麼設計成兩層四檔，全部是純文字檔，換對話、換模型都不會忘記你是誰。我們，下集見。">
+        <div style="display: flex; flex-direction: column; justify-content: center; align-items: center; flex: 1; text-align: center;">
+          <div style="font-size: 26px; color: var(--muted); font-family: var(--mono); margin-bottom: 16px; letter-spacing: 0.15em;">NEXT EPISODE</div>
+          <div style="font-size: 72px; font-weight: 900; background: linear-gradient(135deg, #ffffff, #a5b4fc); -webkit-background-clip: text; -webkit-text-fill-color: transparent; background-clip: text; margin-bottom: 14px;">EP03</div>
+          <div style="font-size: 44px; font-weight: 700; color: var(--white); margin-bottom: 12px;">我的大腦是檔案</div>
+          <div style="font-size: 28px; color: var(--accent); margin-bottom: 48px;">AGENT.md 與記憶四檔</div>
+          <a href="hana-v3-ep3.html"
+             onclick="event.preventDefault(); var p='presentations-v3/'+this.getAttribute('href'); if(window.parent&&window.parent!==window&&window.parent.loadFile){window.parent.loadFile(p);} else {location.href='/raw?path='+encodeURIComponent(p);}"
+             style="display:inline-block; padding: 18px 48px; background: rgba(99,102,241,0.12); border: 2px solid var(--primary); border-radius: 12px; color: var(--white); font-size: 26px; font-weight: 700; text-decoration: none; cursor: pointer;">
+            前往下一集 →
+          </a>
+        </div>
+      </section>
+
+    </main>
+  </div>
+  <script src="/raw?path=portal/presentation-player/presentation-core.js"></script>
+</body>
+</html>

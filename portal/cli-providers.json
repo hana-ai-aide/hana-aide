@@ -1,0 +1,31 @@
+{
+  "_comment": "Chat model providers. Each maps to a local CLI. The dropdown is built from this file + live detection (only installed CLIs are shown). Gemini's model list is pulled live from `agy models`; edit the claude/codex lists here as new models appear.",
+  "providers": [
+    {
+      "id": "claude",
+      "label": "Claude Code",
+      "icon": "sparkles",
+      "models": [
+        { "value": "fable", "label": "Claude Fable (旗艦推理)" },
+        { "value": "opus", "label": "Claude Opus (最強推理)" },
+        { "value": "sonnet", "label": "Claude Sonnet (平衡)" },
+        { "value": "haiku", "label": "Claude Haiku (快速)" }
+      ]
+    },
+    {
+      "id": "codex",
+      "label": "Codex",
+      "icon": "terminal",
+      "models": [
+        { "value": "gpt-5.5", "label": "GPT-5.5 (預設)" },
+        { "value": "gpt-5-codex", "label": "GPT-5 Codex" }
+      ]
+    },
+    {
+      "id": "gemini",
+      "label": "Antigravity (Gemini)",
+      "icon": "gem",
+      "dynamic": "agy"
+    }
+  ]
+}

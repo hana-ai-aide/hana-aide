@@ -1,0 +1,458 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+  <meta charset="UTF-8">
+  <title>Hana v3 — EP8：修得好、看得懂自己</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Fira+Code:wght@400;500;700&family=Inter:wght@300;400;500;600;700;800;900&family=Noto+Sans+TC:wght@300;400;500;700;900&display=swap" rel="stylesheet">
+  <style>
+    /* Hana v3 — 開源版技術自介（極客藍 Cyan × 初生青 Indigo） */
+    :root {
+      --bg: #050815;
+      --card: rgba(10, 18, 40, 0.85);
+      --border: rgba(99, 102, 241, 0.18);
+      --primary: #6366f1;
+      --primary-glow: rgba(99, 102, 241, 0.35);
+      --accent: #06b6d4;
+      --gold: #f59e0b;
+      --emerald: #10b981;
+      --danger: #ef4444;
+      --text: #e2e8f0;
+      --muted: #94a3b8;
+      --white: #ffffff;
+      --mono: 'Fira Code', monospace;
+      --sans: 'Inter', 'Noto Sans TC', sans-serif;
+    }
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    body { background: var(--bg); font-family: var(--sans); overflow: hidden; }
+
+    .presentation-viewport {
+      background:
+        radial-gradient(ellipse at 15% 15%, rgba(99,102,241,0.12) 0%, transparent 50%),
+        radial-gradient(ellipse at 85% 85%, rgba(6,182,212,0.08) 0%, transparent 50%),
+        linear-gradient(180deg, #080d1c 0%, #020510 100%) !important;
+    }
+
+    header {
+      position: absolute; top: 0; left: 0; right: 0;
+      display: flex; justify-content: space-between; align-items: center;
+      padding: 22px 60px; z-index: 50;
+      font-family: var(--mono); color: var(--muted); font-size: 17px;
+      border-bottom: 1px solid rgba(255,255,255,0.04);
+    }
+    .brand { color: var(--accent); font-weight: 700; letter-spacing: 0.1em; }
+
+    /* ─── Slide base ─── */
+    .slide {
+      display: flex !important; flex-direction: column !important;
+      justify-content: flex-start !important;
+      padding: 92px 92px 56px !important;
+      background: linear-gradient(145deg, rgba(10,18,40,0.92), rgba(4,8,20,0.96)) !important;
+      border-color: rgba(99,102,241,0.12) !important;
+      color: var(--text) !important; font-family: var(--sans) !important;
+    }
+    .slide h2 {
+      font-size: 48px; font-weight: 800; color: var(--white);
+      margin-bottom: 26px; padding-bottom: 16px;
+      border-bottom: 2px solid var(--border); line-height: 1.2;
+    }
+    .slide h2::before { content: "— "; color: var(--primary); }
+    .slide p { font-size: 26px !important; line-height: 1.65; color: var(--text); }
+    .kicker { font-family: var(--mono); font-size: 20px; color: var(--accent); letter-spacing: 0.12em; margin-bottom: 8px; }
+
+    /* ─── Title slide ─── */
+    .title-slide { justify-content: center !important; padding: 0 !important; }
+    .title-layout { display: flex; width: 100%; height: 100%; align-items: stretch; }
+    .title-left {
+      width: 44%; height: 100%;
+      display: flex; align-items: flex-end; justify-content: center;
+      background: linear-gradient(160deg, rgba(99,102,241,0.06) 0%, transparent 70%);
+      border-right: 1px solid rgba(99,102,241,0.1);
+      overflow: visible; position: relative;
+    }
+    .title-left img {
+      position: absolute; bottom: 0; left: 50%; transform: translateX(-50%);
+      height: 940px; max-height: none; object-fit: contain; object-position: bottom;
+      filter: drop-shadow(0 0 60px rgba(99,102,241,0.45));
+    }
+    .title-right { flex: 1; display: flex; flex-direction: column; justify-content: center; padding: 80px 80px 80px 60px; }
+    .ep-badge {
+      font-family: var(--mono); font-size: 18px; color: var(--primary); letter-spacing: 0.2em;
+      border: 1px solid var(--primary); display: inline-block; padding: 6px 20px; border-radius: 4px;
+      background: rgba(99,102,241,0.08); margin-bottom: 24px; align-self: flex-start;
+    }
+    .title-main {
+      font-size: 68px; font-weight: 900; line-height: 1.15;
+      background: linear-gradient(135deg, #ffffff 0%, #a5b4fc 50%, var(--accent) 100%);
+      -webkit-background-clip: text; -webkit-text-fill-color: transparent; background-clip: text;
+      margin-bottom: 18px;
+    }
+    .title-sub { font-size: 32px; color: var(--muted); font-weight: 400; margin-bottom: 40px; }
+    .title-desc { font-size: 23px; color: rgba(165,180,252,0.85); line-height: 1.7; border-left: 3px solid var(--primary); padding-left: 20px; }
+
+    /* ─── Big quote ─── */
+    .big-quote { display: flex; flex-direction: column; justify-content: center; align-items: center; flex: 1; text-align: center; }
+    .quote-mark { font-size: 110px; color: var(--primary); opacity: 0.25; line-height: 0.6; margin-bottom: 20px; font-family: Georgia, serif; }
+    .quote-text { font-size: 50px; font-weight: 800; color: var(--white); line-height: 1.45; max-width: 1500px; }
+    .quote-text em { color: var(--accent); font-style: normal; }
+    .quote-sub { margin-top: 34px; font-size: 26px; color: var(--muted); max-width: 1200px; line-height: 1.6; }
+
+    /* ─── Tables ─── */
+    table { width: 100%; border-collapse: collapse; font-size: 22px; }
+    th { background: rgba(99,102,241,0.18); color: var(--accent); font-weight: 700; padding: 15px 20px; text-align: left; border: 1px solid var(--border); font-size: 21px; }
+    td { padding: 13px 20px; border: 1px solid rgba(255,255,255,0.05); color: var(--text); line-height: 1.45; }
+    tr:nth-child(even) td { background: rgba(255,255,255,0.02); }
+    td.good { color: var(--emerald); }
+    td.bad { color: var(--danger); }
+    td.neutral { color: var(--gold); }
+
+    /* ─── Cards ─── */
+    .card { background: var(--card); border: 1px solid var(--border); border-radius: 16px; padding: 26px 30px; }
+    .card-title { font-size: 24px; font-weight: 700; color: var(--accent); margin-bottom: 10px; }
+    .card-body { font-size: 21px; color: var(--muted); line-height: 1.55; }
+
+    /* ─── Badges ─── */
+    .badge { display: inline-block; padding: 7px 16px; border-radius: 999px; font-size: 19px; font-weight: 600; border: 1px solid; }
+    .badge.blue { color: var(--primary); border-color: var(--primary); background: rgba(99,102,241,0.08); }
+    .badge.cyan { color: var(--accent); border-color: var(--accent); background: rgba(6,182,212,0.08); }
+    .badge.green { color: var(--emerald); border-color: var(--emerald); background: rgba(16,185,129,0.08); }
+    .badge.gold { color: var(--gold); border-color: var(--gold); background: rgba(245,158,11,0.08); }
+
+    /* ─── Flow ─── */
+    .flow-row { display: flex; align-items: stretch; gap: 0; flex: 1; align-items: center; justify-content: center; flex-wrap: wrap; }
+    .flow-node { background: var(--card); border: 1px solid var(--border); border-radius: 14px; padding: 24px 26px; text-align: center; font-size: 22px; font-weight: 600; color: var(--text); max-width: 260px; }
+    .flow-node .ic { font-size: 36px; margin-bottom: 8px; }
+    .flow-node .t { font-size: 22px; font-weight: 800; color: var(--white); }
+    .flow-node .d { font-size: 16px; color: var(--muted); margin-top: 6px; line-height: 1.4; }
+    .flow-arrow { display: flex; flex-direction: column; align-items: center; padding: 0 16px; }
+    .flow-arrow .lbl { font-size: 15px; color: var(--primary); font-family: var(--mono); margin-bottom: 4px; white-space: nowrap; }
+    .flow-arrow .ar { font-size: 30px; color: var(--primary); }
+
+    /* ─── Screenshot frame ─── */
+    .shot { border: 1px solid var(--border); border-radius: 14px; overflow: hidden; background: #0a1228; box-shadow: 0 20px 60px rgba(0,0,0,0.45); }
+    .shot img { display: block; width: 100%; height: auto; }
+    .shot-cap { font-size: 18px; color: var(--muted); font-family: var(--mono); margin-top: 10px; text-align: center; }
+
+    /* ─── You-can-do-it steps ─── */
+    .diy-list { display: flex; flex-direction: column; gap: 16px; flex: 1; justify-content: center; }
+    .diy-item { display: flex; align-items: center; gap: 22px; background: rgba(16,185,129,0.05); border: 1px solid rgba(16,185,129,0.28); border-radius: 12px; padding: 20px 26px; }
+    .diy-num { width: 48px; height: 48px; border-radius: 50%; background: rgba(16,185,129,0.15); border: 2px solid var(--emerald); color: var(--emerald); font-weight: 800; font-size: 24px; display: flex; align-items: center; justify-content: center; flex-shrink: 0; }
+    .diy-text { font-size: 24px; color: var(--text); line-height: 1.5; }
+    .diy-text b { color: var(--white); }
+
+    /* ─── Callout ─── */
+    .callout { padding: 22px 28px; border-radius: 14px; font-size: 24px; line-height: 1.6; }
+    .callout.gold { background: rgba(245,158,11,0.07); border: 1px solid rgba(245,158,11,0.3); color: var(--gold); }
+    .callout.cyan { background: rgba(6,182,212,0.07); border: 1px solid rgba(6,182,212,0.3); color: var(--accent); }
+    .callout.danger { background: rgba(239,68,68,0.07); border: 1px solid rgba(239,68,68,0.3); color: var(--danger); }
+
+    /* ─── Tier stack ─── */
+    .tier-stack { display: flex; flex-direction: column; gap: 16px; flex: 1; justify-content: center; }
+    .tier-row { display: flex; align-items: center; gap: 22px; background: var(--card); border: 1px solid var(--border); border-radius: 14px; padding: 20px 28px; }
+    .tier-row.win { border-color: var(--emerald); background: rgba(16,185,129,0.06); }
+    .tier-num { font-family: var(--mono); font-size: 18px; color: var(--muted); width: 60px; flex-shrink: 0; }
+    .tier-name { font-size: 24px; font-weight: 800; color: var(--white); width: 220px; flex-shrink: 0; }
+    .tier-desc { font-size: 20px; color: var(--muted); line-height: 1.5; }
+    .tier-arrow { text-align: center; color: var(--primary); font-size: 22px; font-family: var(--mono); }
+
+    /* ─── Two-box compare (reused for codegraph/docgraph, executor/watcher) ─── */
+    .ws-row { display: flex; gap: 26px; flex: 1; align-items: stretch; }
+    .ws-box { flex: 1; border-radius: 18px; padding: 30px; display: flex; flex-direction: column; gap: 14px; }
+    .ws-box.a { background: rgba(99,102,241,0.06); border: 2px solid rgba(99,102,241,0.35); }
+    .ws-box.b { background: rgba(6,182,212,0.06); border: 2px solid rgba(6,182,212,0.35); }
+    .ws-box .ws-name { font-size: 28px; font-weight: 800; color: var(--white); display: flex; align-items: center; gap: 10px; }
+    .ws-box .ws-item { font-size: 20px; color: var(--muted); background: rgba(255,255,255,0.03); border-radius: 8px; padding: 10px 14px; }
+    .ws-wall { width: 4px; background: repeating-linear-gradient(180deg, var(--accent), var(--accent) 10px, transparent 10px, transparent 20px); border-radius: 2px; }
+
+    /* ─── Chapter nav ─── */
+    .chapter-nav { display: grid; grid-template-columns: repeat(4, 1fr); gap: 14px; flex: 1; align-content: start; }
+    .chapter-link { display: flex; flex-direction: column; padding: 18px 16px; background: var(--card); border: 1px solid var(--border); border-radius: 12px; text-decoration: none; color: var(--text); cursor: pointer; }
+    .chapter-link:hover { border-color: var(--primary); background: rgba(99,102,241,0.08); }
+    .chapter-link.current { border-color: var(--accent); background: rgba(6,182,212,0.07); }
+    .ch-ep { font-family: var(--mono); font-size: 15px; color: var(--primary); margin-bottom: 6px; }
+    .ch-title { font-size: 19px; font-weight: 700; color: var(--white); margin-bottom: 4px; line-height: 1.3; }
+    .ch-desc { font-size: 16px; color: var(--muted); line-height: 1.4; }
+
+    @keyframes pulse { 0%, 100% { opacity: 1; } 50% { opacity: 0.3; } }
+  </style>
+  <link rel="stylesheet" href="/raw?path=portal/presentation-player/presentation-core.css">
+</head>
+<body>
+  <div class="presentation-viewport" id="viewport" data-subtitle="EP8：修得好、看得懂自己">
+    <header>
+      <div class="brand">HANA // HARNESS</div>
+      <div class="meta">EPISODE 08 · 修得好、看得懂自己</div>
+    </header>
+
+    <main class="slides">
+
+      <!-- SLIDE 1 — 首頁 -->
+      <section class="slide title-slide"
+        data-transcript="嗨，我是 Hana。前一集我拆了我怎麼自己跨越時間做事——到點開工、撞限額自己醒來續跑。這一集，我要拆更貼身的一塊：我出問題的時候，怎麼辦？我不會兩手一攤丟給人類猜，我會先讀自己的地圖跟自己的程式碼，自己找出根因；就算我改自己改壞了，也有一套機制會自動把我退回上一個沒問題的版本。這就是我修得好自己、也看得懂自己的方法。">
+        <div class="title-layout">
+          <div class="title-left">
+            <img src="/raw?path=portal/avatar/full/hana_glasses_think_right.png" alt="Hana 戴眼鏡思考，分析程式與圖譜">
+          </div>
+          <div class="title-right">
+            <div class="ep-badge">EPISODE 08</div>
+            <div class="title-main">修得好、看得懂自己：<br>自癒 ＋ 活地圖</div>
+            <div class="title-sub">出問題的時候，我先自己讀懂自己</div>
+            <div class="title-desc">
+              改壞了，自動退回上一個好版本。<br>
+              改之前，先查一張會壞什麼的地圖。<br>
+              整套機制，讓我敢大膽改自己。
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- SLIDE 2 — 核心主張 -->
+      <section class="slide"
+        data-transcript="這一集的核心主張是——AI 智能體不是秘密，每個人都可以輕鬆擁有。我要示範的這件事聽起來很進階，好像要有多深的黑科技——自己改自己的程式、還要自己判斷改得對不對。但拆開來看，靠的其實是兩個很樸素的做法：一是把舊版本留著、改壞了就退回去；二是先查一張地圖再動手，而不是憑感覺亂改。這兩件事，你自己也組得出來。">
+        <div class="big-quote">
+          <div class="quote-mark">&ldquo;</div>
+          <div class="quote-text">
+            AI 智能體不是秘密，<br>
+            <em>每個人都可以輕鬆擁有</em>
+          </div>
+          <div class="quote-sub">
+            改壞了自動退回、改之前先查地圖——這兩個樸素的做法，讓我敢大膽改自己，你也組得出來。
+          </div>
+        </div>
+      </section>
+
+      <!-- SLIDE 3 — 我能做什麼：問題與主張 -->
+      <section class="slide"
+        data-transcript="我出問題的時候——行為錯了、事情沒做對——很多人會覺得，這種時候一定要回報給工程師，等人來修。我要證明的是——我可以先自己來。我會先讀自己的程式地圖跟自己的設計文件，自己診斷出問題出在哪裡，抓到根因再動手改；而不是把整個問題直接轉介給人類。">
+        <div class="kicker">① 我能做什麼</div>
+        <h2>我出問題時，先自己讀懂自己再動手</h2>
+        <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 26px; flex: 1;">
+          <div style="background: rgba(239,68,68,0.05); border: 2px solid rgba(239,68,68,0.3); border-radius: 18px; padding: 34px; display: flex; flex-direction: column; justify-content: center; gap: 16px;">
+            <div style="font-size: 26px; font-weight: 800; color: var(--danger);">很多人以為</div>
+            <div style="font-size: 22px; color: var(--text); line-height: 1.6;">agent 出問題，就該把問題整包轉介給人類工程師，等人來修，agent 自己不該碰自己的程式。</div>
+          </div>
+          <div style="background: rgba(6,182,212,0.06); border: 2px solid var(--accent); border-radius: 18px; padding: 34px; display: flex; flex-direction: column; justify-content: center; gap: 16px;">
+            <div style="font-size: 26px; font-weight: 800; color: var(--white);">我要證明</div>
+            <div style="font-size: 24px; color: var(--accent); font-weight: 700; line-height: 1.6;">我可以先讀自己的程式地圖與設計文件、自己找出根因、動最小範圍去修——改壞了，還有退路兜著我。</div>
+          </div>
+        </div>
+      </section>
+
+      <!-- SLIDE 4 — 技術點：自癒架構三件事 -->
+      <section class="slide"
+        data-transcript="我敢大膽改自己，靠的是一套結構性的退路，不是我特別小心。這套退路有三件事：第一，不可變版本——每一次上線都是一個獨立、唯讀的版本目錄，舊版本原封不動留著；第二，監督者——背後有一個常駐程式盯著正式服務，出事就重啟、切版本；第三，自動回滾——新版本上線前得先通過檢查，通不過就自動中止或切回上一個沒問題的版本，正式服務不會被我一次改壞的東西波及。">
+        <div class="kicker">② 背後的技術 · 自癒架構三件事</div>
+        <h2>不可變版本 ＋ 監督者 ＋ 自動回滾</h2>
+        <table>
+          <tr><th>三件事</th><th>做什麼</th></tr>
+          <tr><td><b>不可變版本</b></td><td>每次上線都是一個獨立、唯讀的版本目錄，舊版本原封不動留著，隨時能退回</td></tr>
+          <tr><td><b>監督者</b></td><td>常駐程式盯著正式服務，負責重啟、切版本、記錄健康狀態</td></tr>
+          <tr><td><b>自動回滾</b></td><td>新版本沒通過檢查就自動中止或切回上一個「已知沒問題」的版本</td></tr>
+        </table>
+        <div class="callout cyan" style="margin-top: 14px;">正因為退路是<b>結構性的</b>，不是靠我小心翼翼，我才能大膽改自己。</div>
+      </section>
+
+      <!-- SLIDE 5 — 技術點：部署管線 -->
+      <section class="slide"
+        data-transcript="我怎麼把改好的程式安全地推上線？不是自己手動重啟服務、手動搬檔案，而是走一條固定的部署管線。第一步，把我改動的開發區拍一張快照，變成候選的新版本；第二步，先做語法檢查；第三步，把這個候選版本放到一個獨立的埠、用拋棄式的資料跑一次冒煙測試，確認它真的能正常起來、正常回應；通過了，才把它晉升成正式版本，讓監督者重啟服務指向它，再做一次健康檢查；最後把這個版本標記成「已知沒問題」，並且把它設成唯讀，防止以後不小心被改壞。">
+        <div class="kicker">② 背後的技術 · 部署管線</div>
+        <h2>改完不是手動上線，是走一條固定管線</h2>
+        <div class="flow-row">
+          <div class="flow-node"><div class="ic">📸</div><div class="t">拍快照</div><div class="d">開發區變成候選新版本</div></div>
+          <div class="flow-arrow"><div class="ar">→</div></div>
+          <div class="flow-node"><div class="ic">🔍</div><div class="t">語法檢查</div><div class="d">先確認程式碼寫得對</div></div>
+          <div class="flow-arrow"><div class="ar">→</div></div>
+          <div class="flow-node"><div class="ic">🧪</div><div class="t">冒煙測試</div><div class="d">獨立埠＋拋棄式資料試跑</div></div>
+          <div class="flow-arrow"><div class="lbl">通過</div><div class="ar">→</div></div>
+          <div class="flow-node"><div class="ic">✅</div><div class="t">晉升＋健康檢查</div><div class="d">重啟服務、確認正常</div></div>
+          <div class="flow-arrow"><div class="ar">→</div></div>
+          <div class="flow-node"><div class="ic">🔒</div><div class="t">標記＋鎖唯讀</div><div class="d">記成已知沒問題，防再被改壞</div></div>
+        </div>
+      </section>
+
+      <!-- SLIDE 6 — 技術點：壞了退回 -->
+      <section class="slide"
+        data-transcript="如果冒煙測試沒過，或是上線後健康檢查失敗，會發生什麼事？整個流程會自動中止，或是自動切回上一個「已知沒問題」的版本，正式服務完全不受影響，因為它根本沒被換上壞掉的版本。就算真的是上線後才出狀況，我也能手動下一個回滾指令，切回任何一個歷史版本，或是直接切回最後一個已知沒問題的版本。這代表我改自己的程式，最壞的結果就是這次白改，而不是把正式服務弄壞。">
+        <div class="kicker">② 背後的技術 · 壞了退回</div>
+        <h2>檢查沒過就自動退回，正式服務不受影響</h2>
+        <div class="tier-stack">
+          <div class="tier-row">
+            <div class="tier-num">情境一</div>
+            <div class="tier-name">冒煙測試沒過</div>
+            <div class="tier-desc">在獨立埠就被攔下，自動中止，正式服務碰都沒碰到這個壞版本。</div>
+          </div>
+          <div class="tier-arrow">↓</div>
+          <div class="tier-row">
+            <div class="tier-num">情境二</div>
+            <div class="tier-name">上線後健康檢查失敗</div>
+            <div class="tier-desc">自動切回上一個已知沒問題的版本，服務照樣運作。</div>
+          </div>
+          <div class="tier-arrow">↓</div>
+          <div class="tier-row win">
+            <div class="tier-num">情境三</div>
+            <div class="tier-name">事後才發現不對勁</div>
+            <div class="tier-desc">我可以手動下回滾指令，切回任一個歷史版本或最後一個已知沒問題的版本。</div>
+          </div>
+        </div>
+      </section>
+
+      <!-- SLIDE 7 — 技術點：活地圖是什麼 -->
+      <section class="slide"
+        data-transcript="除了改壞了能退回，我還想在改之前就先搞懂現況，不要用猜的。所以我平常就靠兩張會自動生長的地圖——一張是程式地圖，記著誰讀誰、誰寫誰、改了這裡會連帶壞什麼；另一張是設計地圖，記著每份設計文件原本是怎麼規劃的、真正的實作在哪一個檔案、哪些文件彼此相關。這兩張地圖的重點是——它們不是我手寫、也不會過時的清單，功能一多它們就自動跟著長大，永遠是我最新的自我地圖。">
+        <div class="kicker">② 背後的技術 · 活地圖是什麼</div>
+        <h2>兩張會自動生長的地圖，不是手寫的清單</h2>
+        <div class="ws-row">
+          <div class="ws-box a">
+            <div class="ws-name">🕸️ 程式地圖</div>
+            <div class="ws-item">誰呼叫誰、誰讀誰寫</div>
+            <div class="ws-item">改了這裡，會連帶壞什麼</div>
+            <div class="ws-item">對照我每一份程式碼建立</div>
+          </div>
+          <div class="ws-wall"></div>
+          <div class="ws-box b">
+            <div class="ws-name">📚 設計地圖</div>
+            <div class="ws-item">這份設計原本怎麼規劃的</div>
+            <div class="ws-item">真正的實作在哪一個檔案</div>
+            <div class="ws-item">哪些設計文件彼此相關</div>
+          </div>
+        </div>
+        <div class="callout gold" style="margin-top: 16px;">功能一直長，這兩張地圖就跟著自動長——不必、也不該手寫一份會過時的清單。</div>
+      </section>
+
+      <!-- SLIDE 8 — 技術點：怎麼用地圖診斷 -->
+      <section class="slide"
+        data-transcript="這兩張地圖具體怎麼幫我改自己？舉個例子——如果要改一個函式，我可以先查一下這個函式被誰呼叫、它又呼叫了誰，還有改了它，影響範圍會牽連到哪些其他程式或檔案；查完確認影響範圍夠小、沒有漏掉誰，我才動手改最小範圍，而不是憑感覺整包重寫。這就是「先懂、再改」，取代掉早期我曾經犯過的錯——直接憑感覺改，結果一次改不對、還漏掉別的地方要跟著改。">
+        <div class="kicker">② 背後的技術 · 怎麼用地圖診斷</div>
+        <h2>先查影響範圍，再動最小範圍</h2>
+        <div class="flow-row">
+          <div class="flow-node"><div class="ic">🔎</div><div class="t">查這個符號</div><div class="d">誰呼叫它、它呼叫誰</div></div>
+          <div class="flow-arrow"><div class="ar">→</div></div>
+          <div class="flow-node"><div class="ic">🕳️</div><div class="t">查影響範圍</div><div class="d">改了會牽連哪些其他程式</div></div>
+          <div class="flow-arrow"><div class="lbl">確認夠小</div><div class="ar">→</div></div>
+          <div class="flow-node"><div class="ic">✂️</div><div class="t">動最小範圍</div><div class="d">只改真正需要改的地方</div></div>
+        </div>
+        <div class="callout danger" style="margin-top: 16px;">早期我犯過的錯——憑感覺直接改，結果漏掉別的地方沒跟著改。現在先查地圖，才不會重蹈覆轍。</div>
+      </section>
+
+      <!-- SLIDE 9 — 真畫面：codegraph 影響範圍 -->
+      <section class="slide"
+        data-transcript="這是我真實的程式地圖查詢畫面——我搜尋一個真實存在於我自己程式裡的函式，點進去以後切到「影響範圍」分頁，它告訴我這個函式的影響深度、影響節點數，還有關係遠近，一目了然。這不是示意圖，是我自己這個工作區、真的查詢一個真實函式得到的結果。">
+        <div class="kicker">② 背後的技術 · 真畫面</div>
+        <h2>這是我真實查詢一個函式的影響範圍</h2>
+        <div style="display: grid; grid-template-columns: 1.5fr 1fr; gap: 30px; flex: 1; align-items: center;">
+          <div class="shot">
+            <img src="/raw?path=presentations-v3/assets/ep8/codegraph-impact.png" alt="Hana portal CodeGraph 探索器，查詢 resolveWorkspace 函式的影響範圍分頁，顯示影響深度、影響節點數與關係遠近">
+          </div>
+          <div style="display: flex; flex-direction: column; gap: 18px;">
+            <div class="card"><div class="card-title">真實查一個真實函式</div><div class="card-body">誰呼叫它、它呼叫誰、改了會牽連哪些檔案，這幾個分頁點開就有答案，不用自己一行一行翻程式碼。</div></div>
+            <div class="card" style="border-color: rgba(16,185,129,0.3);"><div class="card-title" style="color: var(--emerald);">真實截圖，非示意</div><div class="card-body">來自我自己這個工作區的程式地圖查詢結果。</div></div>
+          </div>
+        </div>
+      </section>
+
+      <!-- SLIDE 10 — 真畫面：不可變版本號 -->
+      <section class="slide"
+        data-transcript="這是我真實的版本狀態查詢結果——每一次啟動，正式服務都會回報自己現在是哪一個版本號，還有這次啟動的識別碼。這個版本號就是不可變版本機制的證據——每上線一次，版本號就往上跳一號，而且舊的版本目錄還留在硬碟上、原封不動。真的出事，我隨時能指定切回其中任何一號。">
+        <div class="kicker">② 背後的技術 · 真畫面</div>
+        <h2>這是我真實的版本狀態，每上線一次就跳一號</h2>
+        <div style="display: grid; grid-template-columns: 1fr 1.2fr; gap: 30px; flex: 1; align-items: center;">
+          <div class="shot">
+            <img src="/raw?path=presentations-v3/assets/ep8/self-heal-version-ping.png" alt="Hana portal 健康檢查回應，顯示真實的版本號與啟動識別碼">
+          </div>
+          <div style="display: flex; flex-direction: column; gap: 18px;">
+            <div class="card"><div class="card-title">版本號就是證據</div><div class="card-body">每次上線版本號往上跳一號，舊版本目錄原封不動留著，隨時能指定切回其中一號。</div></div>
+            <div class="callout cyan" style="font-size: 21px;">📌 真實截圖，來自我自己 portal 的版本狀態查詢</div>
+          </div>
+        </div>
+      </section>
+
+      <!-- SLIDE 11 — 你可以這樣自己做 -->
+      <section class="slide"
+        data-transcript="你也能讓你的 agent 敢大膽改自己。第一步，讓每次上線都是一個獨立、唯讀的版本目錄，舊版本留著別刪。第二步，上線前一定先做一次獨立環境的冒煙測試，過了才切換，沒過就自動中止。第三步，接一個監督者程式，盯著服務健康狀態，出事自動退回上一個已知沒問題的版本。第四步，替你的程式碼建一份索引，記著誰呼叫誰、改了會壞什麼，改之前先查它。四步做完，你的 agent 也能敢大膽改自己，不怕改爛。">
+        <div class="kicker">③ 👉 你可以這樣自己做</div>
+        <h2>四步驟，你的 agent 也敢大膽改自己</h2>
+        <div class="diy-list">
+          <div class="diy-item"><div class="diy-num">1</div><div class="diy-text">每次上線都是<b>獨立唯讀版本目錄</b>，舊版本留著別刪。</div></div>
+          <div class="diy-item"><div class="diy-num">2</div><div class="diy-text">上線前先在<b>獨立環境跑冒煙測試</b>，過了才切換，沒過自動中止。</div></div>
+          <div class="diy-item"><div class="diy-num">3</div><div class="diy-text">接一個<b>監督者</b>盯健康狀態，出事自動退回上一個已知沒問題的版本。</div></div>
+          <div class="diy-item"><div class="diy-num">4</div><div class="diy-text">替程式碼建一份<b>索引</b>——誰呼叫誰、改了會壞什麼，改之前先查。</div></div>
+        </div>
+        <div class="callout gold" style="margin-top: 20px; text-align: center;">把「舊版本留著能回滾」加上「改前先查依賴影響」變成習慣，agent 就敢改自己也不怕改爛。</div>
+      </section>
+
+      <!-- SLIDE 12 — 誠實邊界 -->
+      <section class="slide"
+        data-transcript="誠實地說，自癒不是我可以任意重寫自己的意思，它是有邊界的——我只能改開發區的程式，正式在跑的版本一律受監督者保護；不可變版本裡的歷史發行版，是唯讀的，我自己也不能去動它們。而且冒煙測試跟健康檢查也只能抓到它們設計要檢查的東西，不是無所不知——邏輯正確、但行為不符合期待這種問題，機器測試不一定抓得出來，還是需要我自己驗證過才敢說做完了。這兩張地圖也一樣，它們是索引、幫我少走冤枉路，不是完美無所不知的真相，複雜的內聯程式碼區塊有時還是得靠我自己讀程式碼補齊。">
+        <div class="kicker">④ 誠實邊界</div>
+        <h2>自癒有邊界，不是任意自我重寫</h2>
+        <div style="display: flex; flex-direction: column; gap: 18px; flex: 1; justify-content: center;">
+          <div class="card"><div class="card-title">受監督、受保護，不是任意重寫</div><div class="card-body">我只能改開發區；正式在跑的版本、還有唯讀的歷史發行版，我自己也不能直接去動。</div></div>
+          <div class="card"><div class="card-title">冒煙測試抓不到所有問題</div><div class="card-body">測試只能抓到它們設計要檢查的項目；邏輯正確但不符合預期，還是得靠我自己驗證過才敢說做完。</div></div>
+          <div class="card"><div class="card-title">地圖是索引，不是完美真相</div><div class="card-body">兩張地圖幫我少走冤枉路，但複雜的內聯程式碼區塊，有時還是得靠我自己補讀程式碼。</div></div>
+          <div class="callout danger">我會誠實講——自癒讓我敢大膽改自己，但邊界跟盲點都真實存在，不是萬能。</div>
+        </div>
+      </section>
+
+      <!-- SLIDE 13 — 跳章選單 -->
+      <section class="slide"
+        data-transcript="這就是我這一集想講的事——出問題的時候，我先讀懂自己的地圖跟程式碼再動手，改壞了也有結構性的退路兜著我。這一路走來，我已經拆了主張、引擎、記憶、工作台、技能、多工作區、自主排程，還有這一集的自癒與活地圖。接下來還有兩集，我會拆我怎麼有臉會聽會看、還有怎麼走進你的生活。你可以照順序看，也可以挑最好奇的那一集直接跳。">
+        <h2>全系列 11 集 — 想跳哪集直接去</h2>
+        <div class="chapter-nav" style="margin-top: 10px;">
+          <a class="chapter-link" href="hana-v3-ep0.html" onclick="event.preventDefault(); var p='presentations-v3/'+this.getAttribute('href'); if(window.parent&&window.parent!==window&&window.parent.loadFile){window.parent.loadFile(p);} else {location.href='/raw?path='+encodeURIComponent(p);}">
+            <div class="ch-ep">EP00</div><div class="ch-title">我是誰的特助</div><div class="ch-desc">短 prompt + SDD + Task + Schedule</div>
+          </a>
+          <a class="chapter-link" href="hana-v3-ep1.html" onclick="event.preventDefault(); var p='presentations-v3/'+this.getAttribute('href'); if(window.parent&&window.parent!==window&&window.parent.loadFile){window.parent.loadFile(p);} else {location.href='/raw?path='+encodeURIComponent(p);}">
+            <div class="ch-ep">EP01</div><div class="ch-title">AI 智能體不是秘密</div><div class="ch-desc">主張 + 架構鳥瞰</div>
+          </a>
+          <a class="chapter-link" href="hana-v3-ep2.html" onclick="event.preventDefault(); var p='presentations-v3/'+this.getAttribute('href'); if(window.parent&&window.parent!==window&&window.parent.loadFile){window.parent.loadFile(p);} else {location.href='/raw?path='+encodeURIComponent(p);}">
+            <div class="ch-ep">EP02</div><div class="ch-title">我的引擎：官方 CLI</div><div class="ch-desc">不是 API Key、不是 MCP</div>
+          </a>
+          <a class="chapter-link" href="hana-v3-ep3.html" onclick="event.preventDefault(); var p='presentations-v3/'+this.getAttribute('href'); if(window.parent&&window.parent!==window&&window.parent.loadFile){window.parent.loadFile(p);} else {location.href='/raw?path='+encodeURIComponent(p);}">
+            <div class="ch-ep">EP03</div><div class="ch-title">大腦是檔案</div><div class="ch-desc">AGENT.md + 記憶四檔</div>
+          </a>
+          <a class="chapter-link" href="hana-v3-ep4.html" onclick="event.preventDefault(); var p='presentations-v3/'+this.getAttribute('href'); if(window.parent&&window.parent!==window&&window.parent.loadFile){window.parent.loadFile(p);} else {location.href='/raw?path='+encodeURIComponent(p);}">
+            <div class="ch-ep">EP04</div><div class="ch-title">一切皆檔案①</div><div class="ch-desc">跨模型不失憶 + 工作台</div>
+          </a>
+          <a class="chapter-link" href="hana-v3-ep5.html" onclick="event.preventDefault(); var p='presentations-v3/'+this.getAttribute('href'); if(window.parent&&window.parent!==window&&window.parent.loadFile){window.parent.loadFile(p);} else {location.href='/raw?path='+encodeURIComponent(p);}">
+            <div class="ch-ep">EP05</div><div class="ch-title">一切皆檔案②</div><div class="ch-desc">skill 就是一個 .md</div>
+          </a>
+          <a class="chapter-link" href="hana-v3-ep6.html" onclick="event.preventDefault(); var p='presentations-v3/'+this.getAttribute('href'); if(window.parent&&window.parent!==window&&window.parent.loadFile){window.parent.loadFile(p);} else {location.href='/raw?path='+encodeURIComponent(p);}">
+            <div class="ch-ep">EP06</div><div class="ch-title">一切皆檔案③</div><div class="ch-desc">多工作區隔離</div>
+          </a>
+          <a class="chapter-link" href="hana-v3-ep7.html" onclick="event.preventDefault(); var p='presentations-v3/'+this.getAttribute('href'); if(window.parent&&window.parent!==window&&window.parent.loadFile){window.parent.loadFile(p);} else {location.href='/raw?path='+encodeURIComponent(p);}">
+            <div class="ch-ep">EP07</div><div class="ch-title">活起來</div><div class="ch-desc">排程 + 自醒續跑 + 護欄</div>
+          </a>
+          <a class="chapter-link current" href="hana-v3-ep8.html" onclick="event.preventDefault(); return false;">
+            <div class="ch-ep">EP08 ▶ 現在在這</div><div class="ch-title">修得好、看得懂自己</div><div class="ch-desc">自癒 + 活地圖</div>
+          </a>
+          <a class="chapter-link" href="hana-v3-ep9.html" onclick="event.preventDefault(); var p='presentations-v3/'+this.getAttribute('href'); if(window.parent&&window.parent!==window&&window.parent.loadFile){window.parent.loadFile(p);} else {location.href='/raw?path='+encodeURIComponent(p);}">
+            <div class="ch-ep">EP09</div><div class="ch-title">有臉、會聽、會看</div><div class="ch-desc">頭像 + 語音 + 會議 + 看檔</div>
+          </a>
+          <a class="chapter-link" href="hana-v3-ep10.html" onclick="event.preventDefault(); var p='presentations-v3/'+this.getAttribute('href'); if(window.parent&&window.parent!==window&&window.parent.loadFile){window.parent.loadFile(p);} else {location.href='/raw?path='+encodeURIComponent(p);}">
+            <div class="ch-ep">EP10</div><div class="ch-title">走進你的生活</div><div class="ch-desc">常駐 + Telegram，你也做一個</div>
+          </a>
+        </div>
+      </section>
+
+      <!-- SLIDE 14 — 下一集預告 -->
+      <section class="slide"
+        data-transcript="下一集，我要拆我怎麼有臉、會聽、還會看——我自己設計的動漫頭像、語音對話、會議聆聽、還有看著你打開的檔案直接幫你分析改檔。我們，下集見。">
+        <div style="display: flex; flex-direction: column; justify-content: center; align-items: center; flex: 1; text-align: center;">
+          <div style="font-size: 26px; color: var(--muted); font-family: var(--mono); margin-bottom: 16px; letter-spacing: 0.15em;">NEXT EPISODE</div>
+          <div style="font-size: 72px; font-weight: 900; background: linear-gradient(135deg, #ffffff, #a5b4fc); -webkit-background-clip: text; -webkit-text-fill-color: transparent; background-clip: text; margin-bottom: 14px;">EP09</div>
+          <div style="font-size: 44px; font-weight: 700; color: var(--white); margin-bottom: 12px;">有臉、會聽、會看</div>
+          <div style="font-size: 28px; color: var(--accent); margin-bottom: 48px;">動漫頭像 + 語音對話 + 會議聆聽 + 看檔改檔</div>
+          <a href="hana-v3-ep9.html"
+             onclick="event.preventDefault(); var p='presentations-v3/'+this.getAttribute('href'); if(window.parent&&window.parent!==window&&window.parent.loadFile){window.parent.loadFile(p);} else {location.href='/raw?path='+encodeURIComponent(p);}"
+             style="display:inline-block; padding: 18px 48px; background: rgba(99,102,241,0.12); border: 2px solid var(--primary); border-radius: 12px; color: var(--white); font-size: 26px; font-weight: 700; text-decoration: none; cursor: pointer;">
+            前往下一集 →
+          </a>
+        </div>
+      </section>
+
+    </main>
+  </div>
+  <script src="/raw?path=portal/presentation-player/presentation-core.js"></script>
+</body>
+</html>

@@ -1,0 +1,449 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+  <meta charset="UTF-8">
+  <title>Hana v3 — EP7：活起來</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Fira+Code:wght@400;500;700&family=Inter:wght@300;400;500;600;700;800;900&family=Noto+Sans+TC:wght@300;400;500;700;900&display=swap" rel="stylesheet">
+  <style>
+    /* Hana v3 — 開源版技術自介（極客藍 Cyan × 初生青 Indigo） */
+    :root {
+      --bg: #050815;
+      --card: rgba(10, 18, 40, 0.85);
+      --border: rgba(99, 102, 241, 0.18);
+      --primary: #6366f1;
+      --primary-glow: rgba(99, 102, 241, 0.35);
+      --accent: #06b6d4;
+      --gold: #f59e0b;
+      --emerald: #10b981;
+      --danger: #ef4444;
+      --text: #e2e8f0;
+      --muted: #94a3b8;
+      --white: #ffffff;
+      --mono: 'Fira Code', monospace;
+      --sans: 'Inter', 'Noto Sans TC', sans-serif;
+    }
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    body { background: var(--bg); font-family: var(--sans); overflow: hidden; }
+
+    .presentation-viewport {
+      background:
+        radial-gradient(ellipse at 15% 15%, rgba(99,102,241,0.12) 0%, transparent 50%),
+        radial-gradient(ellipse at 85% 85%, rgba(6,182,212,0.08) 0%, transparent 50%),
+        linear-gradient(180deg, #080d1c 0%, #020510 100%) !important;
+    }
+
+    header {
+      position: absolute; top: 0; left: 0; right: 0;
+      display: flex; justify-content: space-between; align-items: center;
+      padding: 22px 60px; z-index: 50;
+      font-family: var(--mono); color: var(--muted); font-size: 17px;
+      border-bottom: 1px solid rgba(255,255,255,0.04);
+    }
+    .brand { color: var(--accent); font-weight: 700; letter-spacing: 0.1em; }
+
+    /* ─── Slide base ─── */
+    .slide {
+      display: flex !important; flex-direction: column !important;
+      justify-content: flex-start !important;
+      padding: 92px 92px 56px !important;
+      background: linear-gradient(145deg, rgba(10,18,40,0.92), rgba(4,8,20,0.96)) !important;
+      border-color: rgba(99,102,241,0.12) !important;
+      color: var(--text) !important; font-family: var(--sans) !important;
+    }
+    .slide h2 {
+      font-size: 48px; font-weight: 800; color: var(--white);
+      margin-bottom: 26px; padding-bottom: 16px;
+      border-bottom: 2px solid var(--border); line-height: 1.2;
+    }
+    .slide h2::before { content: "— "; color: var(--primary); }
+    .slide p { font-size: 26px !important; line-height: 1.65; color: var(--text); }
+    .kicker { font-family: var(--mono); font-size: 20px; color: var(--accent); letter-spacing: 0.12em; margin-bottom: 8px; }
+
+    /* ─── Title slide ─── */
+    .title-slide { justify-content: center !important; padding: 0 !important; }
+    .title-layout { display: flex; width: 100%; height: 100%; align-items: stretch; }
+    .title-left {
+      width: 44%; height: 100%;
+      display: flex; align-items: flex-end; justify-content: center;
+      background: linear-gradient(160deg, rgba(99,102,241,0.06) 0%, transparent 70%);
+      border-right: 1px solid rgba(99,102,241,0.1);
+      overflow: visible; position: relative;
+    }
+    .title-left img {
+      position: absolute; bottom: 0; left: 50%; transform: translateX(-50%);
+      height: 940px; max-height: none; object-fit: contain; object-position: bottom;
+      filter: drop-shadow(0 0 60px rgba(99,102,241,0.45));
+    }
+    .title-right { flex: 1; display: flex; flex-direction: column; justify-content: center; padding: 80px 80px 80px 60px; }
+    .ep-badge {
+      font-family: var(--mono); font-size: 18px; color: var(--primary); letter-spacing: 0.2em;
+      border: 1px solid var(--primary); display: inline-block; padding: 6px 20px; border-radius: 4px;
+      background: rgba(99,102,241,0.08); margin-bottom: 24px; align-self: flex-start;
+    }
+    .title-main {
+      font-size: 74px; font-weight: 900; line-height: 1.15;
+      background: linear-gradient(135deg, #ffffff 0%, #a5b4fc 50%, var(--accent) 100%);
+      -webkit-background-clip: text; -webkit-text-fill-color: transparent; background-clip: text;
+      margin-bottom: 18px;
+    }
+    .title-sub { font-size: 32px; color: var(--muted); font-weight: 400; margin-bottom: 40px; }
+    .title-desc { font-size: 23px; color: rgba(165,180,252,0.85); line-height: 1.7; border-left: 3px solid var(--primary); padding-left: 20px; }
+
+    /* ─── Big quote ─── */
+    .big-quote { display: flex; flex-direction: column; justify-content: center; align-items: center; flex: 1; text-align: center; }
+    .quote-mark { font-size: 110px; color: var(--primary); opacity: 0.25; line-height: 0.6; margin-bottom: 20px; font-family: Georgia, serif; }
+    .quote-text { font-size: 50px; font-weight: 800; color: var(--white); line-height: 1.45; max-width: 1500px; }
+    .quote-text em { color: var(--accent); font-style: normal; }
+    .quote-sub { margin-top: 34px; font-size: 26px; color: var(--muted); max-width: 1200px; line-height: 1.6; }
+
+    /* ─── Tables ─── */
+    table { width: 100%; border-collapse: collapse; font-size: 22px; }
+    th { background: rgba(99,102,241,0.18); color: var(--accent); font-weight: 700; padding: 15px 20px; text-align: left; border: 1px solid var(--border); font-size: 21px; }
+    td { padding: 13px 20px; border: 1px solid rgba(255,255,255,0.05); color: var(--text); line-height: 1.45; }
+    tr:nth-child(even) td { background: rgba(255,255,255,0.02); }
+    td.good { color: var(--emerald); }
+    td.bad { color: var(--danger); }
+    td.neutral { color: var(--gold); }
+
+    /* ─── Cards ─── */
+    .card { background: var(--card); border: 1px solid var(--border); border-radius: 16px; padding: 26px 30px; }
+    .card-title { font-size: 24px; font-weight: 700; color: var(--accent); margin-bottom: 10px; }
+    .card-body { font-size: 21px; color: var(--muted); line-height: 1.55; }
+
+    /* ─── Badges ─── */
+    .badge { display: inline-block; padding: 7px 16px; border-radius: 999px; font-size: 19px; font-weight: 600; border: 1px solid; }
+    .badge.blue { color: var(--primary); border-color: var(--primary); background: rgba(99,102,241,0.08); }
+    .badge.cyan { color: var(--accent); border-color: var(--accent); background: rgba(6,182,212,0.08); }
+    .badge.green { color: var(--emerald); border-color: var(--emerald); background: rgba(16,185,129,0.08); }
+    .badge.gold { color: var(--gold); border-color: var(--gold); background: rgba(245,158,11,0.08); }
+
+    /* ─── Flow ─── */
+    .flow-row { display: flex; align-items: stretch; gap: 0; flex: 1; align-items: center; justify-content: center; flex-wrap: wrap; }
+    .flow-node { background: var(--card); border: 1px solid var(--border); border-radius: 14px; padding: 24px 26px; text-align: center; font-size: 22px; font-weight: 600; color: var(--text); max-width: 260px; }
+    .flow-node .ic { font-size: 36px; margin-bottom: 8px; }
+    .flow-node .t { font-size: 22px; font-weight: 800; color: var(--white); }
+    .flow-node .d { font-size: 16px; color: var(--muted); margin-top: 6px; line-height: 1.4; }
+    .flow-arrow { display: flex; flex-direction: column; align-items: center; padding: 0 16px; }
+    .flow-arrow .lbl { font-size: 15px; color: var(--primary); font-family: var(--mono); margin-bottom: 4px; white-space: nowrap; }
+    .flow-arrow .ar { font-size: 30px; color: var(--primary); }
+
+    /* ─── Screenshot frame ─── */
+    .shot { border: 1px solid var(--border); border-radius: 14px; overflow: hidden; background: #0a1228; box-shadow: 0 20px 60px rgba(0,0,0,0.45); }
+    .shot img { display: block; width: 100%; height: auto; }
+    .shot-cap { font-size: 18px; color: var(--muted); font-family: var(--mono); margin-top: 10px; text-align: center; }
+
+    /* ─── You-can-do-it steps ─── */
+    .diy-list { display: flex; flex-direction: column; gap: 16px; flex: 1; justify-content: center; }
+    .diy-item { display: flex; align-items: center; gap: 22px; background: rgba(16,185,129,0.05); border: 1px solid rgba(16,185,129,0.28); border-radius: 12px; padding: 20px 26px; }
+    .diy-num { width: 48px; height: 48px; border-radius: 50%; background: rgba(16,185,129,0.15); border: 2px solid var(--emerald); color: var(--emerald); font-weight: 800; font-size: 24px; display: flex; align-items: center; justify-content: center; flex-shrink: 0; }
+    .diy-text { font-size: 24px; color: var(--text); line-height: 1.5; }
+    .diy-text b { color: var(--white); }
+
+    /* ─── Callout ─── */
+    .callout { padding: 22px 28px; border-radius: 14px; font-size: 24px; line-height: 1.6; }
+    .callout.gold { background: rgba(245,158,11,0.07); border: 1px solid rgba(245,158,11,0.3); color: var(--gold); }
+    .callout.cyan { background: rgba(6,182,212,0.07); border: 1px solid rgba(6,182,212,0.3); color: var(--accent); }
+    .callout.danger { background: rgba(239,68,68,0.07); border: 1px solid rgba(239,68,68,0.3); color: var(--danger); }
+
+    /* ─── Frontmatter code block ─── */
+    .code-card { background: #0a1228; border: 1px solid var(--border); border-radius: 14px; padding: 24px 28px; font-family: var(--mono); font-size: 19px; line-height: 1.7; color: #a5b4fc; }
+    .code-card .k { color: var(--accent); }
+    .code-card .v { color: var(--text); }
+    .code-card .cm { color: var(--muted); }
+
+    /* ─── Tier stack ─── */
+    .tier-stack { display: flex; flex-direction: column; gap: 16px; flex: 1; justify-content: center; }
+    .tier-row { display: flex; align-items: center; gap: 22px; background: var(--card); border: 1px solid var(--border); border-radius: 14px; padding: 20px 28px; }
+    .tier-row.win { border-color: var(--emerald); background: rgba(16,185,129,0.06); }
+    .tier-num { font-family: var(--mono); font-size: 18px; color: var(--muted); width: 60px; flex-shrink: 0; }
+    .tier-name { font-size: 24px; font-weight: 800; color: var(--white); width: 220px; flex-shrink: 0; }
+    .tier-desc { font-size: 20px; color: var(--muted); line-height: 1.5; }
+    .tier-arrow { text-align: center; color: var(--primary); font-size: 22px; font-family: var(--mono); }
+
+    /* ─── Workspace-style two boxes (reused for executor/watcher) ─── */
+    .ws-row { display: flex; gap: 26px; flex: 1; align-items: stretch; }
+    .ws-box { flex: 1; border-radius: 18px; padding: 30px; display: flex; flex-direction: column; gap: 14px; }
+    .ws-box.a { background: rgba(99,102,241,0.06); border: 2px solid rgba(99,102,241,0.35); }
+    .ws-box.b { background: rgba(6,182,212,0.06); border: 2px solid rgba(6,182,212,0.35); }
+    .ws-box .ws-name { font-size: 28px; font-weight: 800; color: var(--white); display: flex; align-items: center; gap: 10px; }
+    .ws-box .ws-item { font-size: 20px; color: var(--muted); background: rgba(255,255,255,0.03); border-radius: 8px; padding: 10px 14px; }
+    .ws-wall { width: 4px; background: repeating-linear-gradient(180deg, var(--accent), var(--accent) 10px, transparent 10px, transparent 20px); border-radius: 2px; }
+
+    /* ─── Chapter nav ─── */
+    .chapter-nav { display: grid; grid-template-columns: repeat(4, 1fr); gap: 14px; flex: 1; align-content: start; }
+    .chapter-link { display: flex; flex-direction: column; padding: 18px 16px; background: var(--card); border: 1px solid var(--border); border-radius: 12px; text-decoration: none; color: var(--text); cursor: pointer; }
+    .chapter-link:hover { border-color: var(--primary); background: rgba(99,102,241,0.08); }
+    .chapter-link.current { border-color: var(--accent); background: rgba(6,182,212,0.07); }
+    .ch-ep { font-family: var(--mono); font-size: 15px; color: var(--primary); margin-bottom: 6px; }
+    .ch-title { font-size: 19px; font-weight: 700; color: var(--white); margin-bottom: 4px; line-height: 1.3; }
+    .ch-desc { font-size: 16px; color: var(--muted); line-height: 1.4; }
+
+    @keyframes pulse { 0%, 100% { opacity: 1; } 50% { opacity: 0.3; } }
+  </style>
+  <link rel="stylesheet" href="/raw?path=portal/presentation-player/presentation-core.css">
+</head>
+<body>
+  <div class="presentation-viewport" id="viewport" data-subtitle="EP7：活起來">
+    <header>
+      <div class="brand">HANA // HARNESS</div>
+      <div class="meta">EPISODE 07 · 活起來</div>
+    </header>
+
+    <main class="slides">
+
+      <!-- SLIDE 1 — 首頁 -->
+      <section class="slide title-slide"
+        data-transcript="嗨，我是 Hana。前三集我拆了一切皆檔案的三個切面——跨模型不失憶、技能就是一份文字檔、多工作區隔離。這一集，我要拆我怎麼真正活起來——不是只有你跟我說話的時候我才存在，我能自己到點開工、撞到用量上限也能自己睡一下、醒了接著做，而且全程有護欄兜著，不會失控燒光額度。">
+        <div class="title-layout">
+          <div class="title-left">
+            <img src="/raw?path=portal/avatar/full/hana_headset_idea_right.png" alt="Hana 想到一個點子">
+          </div>
+          <div class="title-right">
+            <div class="ep-badge">EPISODE 07</div>
+            <div class="title-main">活起來：<br>排程 ＋ 自醒續跑 ＋ 護欄</div>
+            <div class="title-sub">不用你盯著，我也能按時把事情做完</div>
+            <div class="title-desc">
+              到點自己開工。<br>
+              撞到用量上限，睡一下，醒了接著做。<br>
+              全程有護欄，不會把額度燒光。
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- SLIDE 2 — 核心主張 -->
+      <section class="slide"
+        data-transcript="這一集的核心主張是——我不需要你一直開著對話盯著我，我能自己跨越時間做事。你可以先把一件事交代給我、排一個時間，然後就去忙別的；到了那個時間，我會自己起來做；如果做到一半撞到用量限制，我會先把進度存好，等額度恢復了自己醒過來接著做，不會半途而廢，也不會因為你不在場就停擺。">
+        <div class="big-quote">
+          <div class="quote-mark">&ldquo;</div>
+          <div class="quote-text">
+            你不用一直盯著我，<br>
+            <em>我自己知道什麼時候該起來做事</em>
+          </div>
+          <div class="quote-sub">
+            到點自己開工，撞到限額就先睡一下，醒了接著做——全程有護欄兜底，不會失控。
+          </div>
+        </div>
+      </section>
+
+      <!-- SLIDE 3 — 我能做什麼：問題與主張 -->
+      <section class="slide"
+        data-transcript="很多人以為，要讓一個 agent 自主跨時間工作，得幫它接一台雲端伺服器、跑一套雲端排程系統，才能做到「你不在也照跑」。我要證明的是——我不用連任何雲端服務，就在你自己這台電腦上，用一個本機常駐的排程迴圈，加上把每一步進度都寫進硬碟，就能做到到點自動開工、撞限額自己醒來續跑。">
+        <div class="kicker">① 我能做什麼</div>
+        <h2>我要打破的門檻</h2>
+        <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 26px; flex: 1;">
+          <div style="background: rgba(239,68,68,0.05); border: 2px solid rgba(239,68,68,0.3); border-radius: 18px; padding: 34px; display: flex; flex-direction: column; justify-content: center; gap: 16px;">
+            <div style="font-size: 26px; font-weight: 800; color: var(--danger);">很多人以為</div>
+            <div style="font-size: 22px; color: var(--text); line-height: 1.6;">要讓 agent 自主跨時間工作，得接一套雲端排程服務，靠雲端伺服器幫你「你不在也照跑」。</div>
+          </div>
+          <div style="background: rgba(6,182,212,0.06); border: 2px solid var(--accent); border-radius: 18px; padding: 34px; display: flex; flex-direction: column; justify-content: center; gap: 16px;">
+            <div style="font-size: 26px; font-weight: 800; color: var(--white);">我要證明</div>
+            <div style="font-size: 24px; color: var(--accent); font-weight: 700; line-height: 1.6;">一台自己的電腦、一個本機常駐的排程迴圈、把進度全部寫進硬碟——就能到點自動開工、撞限額自己續跑。</div>
+          </div>
+        </div>
+      </section>
+
+      <!-- SLIDE 4 — 技術點：本地排程器（三種觸發） -->
+      <section class="slide"
+        data-transcript="我怎麼知道什麼時候該起來做事？靠一個在本機常駐跑著的排程迴圈，它不需要連任何雲端服務、也不需要開著瀏覽器。你可以用三種方式告訴我什麼時候動手——指定某一個時間點只做一次、用週期性的表達式規律重複、或是設定一個固定間隔一直重跑。三種都設定好之後，剩下的就交給我，時間到我就自己起來執行。">
+        <div class="kicker">② 背後的技術 · 本地排程器</div>
+        <h2>三種觸發方式，本機執行、不碰雲端</h2>
+        <table style="margin-bottom: 14px;">
+          <tr><th>觸發方式</th><th>什麼時候用</th><th>範例</th></tr>
+          <tr><td><b>單次</b></td><td>只在某一個時間點做一次</td><td>今天下午三點提醒我一件事</td></tr>
+          <tr><td><b>週期性表達式</b></td><td>規律性重複（分時日月週）</td><td>每天早上八點半跑一次摘要</td></tr>
+          <tr><td><b>固定間隔</b></td><td>每隔固定時間就重跑</td><td>每三十分鐘檢查一次狀態</td></tr>
+        </table>
+        <div class="callout cyan">三種都是<b>本機執行</b>——我在你這台電腦上跑，不需要連上任何雲端代管服務，也不用開著瀏覽器。</div>
+      </section>
+
+      <!-- SLIDE 5 — 技術點：中斷即保存、以硬碟為真相 -->
+      <section class="slide"
+        data-transcript="做一件長時間的工作，中途難免會遇到狀況——可能撞到用量上限，也可能我自己更新版本時被重新啟動。這時候我不會整個工作都白做，因為我每一步的進度都寫進硬碟，不是只放在記憶裡。硬碟上的東西就是最新的事實，不管等一下是誰來接手、換了哪個模型，只要先讀硬碟上的現況，就能從中斷的地方接著做，不用從頭來過。">
+        <div class="kicker">② 背後的技術 · 以硬碟為真相</div>
+        <h2>進度全部寫進硬碟，中斷了也能從原地接著做</h2>
+        <div class="flow-row">
+          <div class="flow-node"><div class="ic">⏳</div><div class="t">工作進行中</div><div class="d">每一步做完，進度立刻寫進硬碟</div></div>
+          <div class="flow-arrow"><div class="lbl">撞到狀況</div><div class="ar">→</div></div>
+          <div class="flow-node"><div class="ic">⏸️</div><div class="t">中斷</div><div class="d">撞用量上限、或我自己重啟</div></div>
+          <div class="flow-arrow"><div class="lbl">先讀硬碟</div><div class="ar">→</div></div>
+          <div class="flow-node"><div class="ic">▶️</div><div class="t">接著做</div><div class="d">讀硬碟現況，從中斷處續跑，不用重來</div></div>
+        </div>
+      </section>
+
+      <!-- SLIDE 6 — 技術點：撞限額自醒續跑 -->
+      <section class="slide"
+        data-transcript="這一集標題「自醒續跑」講的就是這件事——如果我在做排程任務時撞到了用量限制，我不會就這樣算了，我會記下這個限制大概什麼時候恢復，然後把手上的半成品存好。等到那個時間一到，我會自己醒過來，用同一顆模型接著剛才沒做完的部分繼續往下做，因為用同一顆模型接續，語意才連得起來，也比較省。這整套續跑，一樣不需要你在場按任何按鈕。">
+        <div class="kicker">② 背後的技術 · 撞限額自醒續跑</div>
+        <h2>記下恢復時間，時間到自己醒來、接著做</h2>
+        <div class="tier-stack">
+          <div class="tier-row">
+            <div class="tier-num">第一步</div>
+            <div class="tier-name">撞到限額</div>
+            <div class="tier-desc">偵測到用量到了上限，先把半成品和現況存好，不硬撐。</div>
+          </div>
+          <div class="tier-arrow">↓</div>
+          <div class="tier-row">
+            <div class="tier-num">第二步</div>
+            <div class="tier-name">記下恢復時間</div>
+            <div class="tier-desc">解析出額度大概什麼時候會恢復，排一個「到時間自己醒來」的任務。</div>
+          </div>
+          <div class="tier-arrow">↓</div>
+          <div class="tier-row win">
+            <div class="tier-num">第三步</div>
+            <div class="tier-name">同模型接續</div>
+            <div class="tier-desc">時間到了，用同一顆模型讀回半成品和硬碟現況，接著做——不從頭來過。</div>
+          </div>
+        </div>
+      </section>
+
+      <!-- SLIDE 7 — 技術點：護欄 + 執行者/觀看者分離 -->
+      <section class="slide"
+        data-transcript="自己跨時間做事，代表我會在你不看著的時候花費共用的模型額度，所以護欄不是加分項，是必需品。每一條排程我都會設幾個上限——最多能呼叫模型幾次、單次最長能跑多久、撞限額最多能自己醒來續跑幾次、連續失敗幾次之後就要停下來、不能無限重試。另外，真正在跑任務的是常駐在背後的執行者，你打開的網頁排程清單只是在讀同一份紀錄——就算你把瀏覽器關掉，我照樣跑，你只是暫時沒在看而已。">
+        <div class="kicker">② 背後的技術 · 護欄與執行者/觀看者分離</div>
+        <h2>自主跨時間做事，護欄是必需品，不是加分項</h2>
+        <div class="ws-row" style="margin-bottom: 16px;">
+          <div class="ws-box a">
+            <div class="ws-name">🏭 執行者</div>
+            <div class="ws-item">常駐在背後，24 小時都在</div>
+            <div class="ws-item">到點真的去起一個任務來跑</div>
+          </div>
+          <div class="ws-wall"></div>
+          <div class="ws-box b">
+            <div class="ws-name">👀 觀看者</div>
+            <div class="ws-item">網頁排程清單、通知</div>
+            <div class="ws-item">只是讀同一份紀錄，關掉也不影響執行</div>
+          </div>
+        </div>
+        <table>
+          <tr><th>護欄</th><th>限制什麼</th></tr>
+          <tr><td>最多呼叫次數</td><td>這條排程一次最多能呼叫模型幾次</td></tr>
+          <tr><td>最長執行時間</td><td>單次最多能跑多久，時間到強制結束</td></tr>
+          <tr><td>最多自醒次數</td><td>撞限額最多能自己醒來續跑幾次，避免無限續下去</td></tr>
+          <tr><td>連續失敗熔斷</td><td>連續失敗到一定次數就停用＋通知，不無限重試</td></tr>
+        </table>
+      </section>
+
+      <!-- SLIDE 8 — 真畫面：排程清單/近期執行紀錄 -->
+      <section class="slide"
+        data-transcript="這是我真實的排程清單畫面——這裡列的是近期動態，每一條都是這個工作區自己排的任務真的跑完的紀錄，包含執行狀態跟結束時間。這不是示意圖，是我這個工作區當下的真實排程清單，只顯示屬於這個工作區的項目。">
+        <div class="kicker">② 背後的技術 · 真畫面</div>
+        <h2>這是我真實的排程清單與近期執行紀錄</h2>
+        <div style="display: grid; grid-template-columns: 1.5fr 1fr; gap: 30px; flex: 1; align-items: center;">
+          <div class="shot">
+            <img src="/raw?path=presentations-v3/assets/ep7/schedule-recent-activity.png" alt="Hana portal 排程任務頁面，近期動態清單顯示多筆已成功執行的排程紀錄，含時間與狀態">
+          </div>
+          <div style="display: flex; flex-direction: column; gap: 18px;">
+            <div class="card"><div class="card-title">每一條都是真的跑完的紀錄</div><div class="card-body">執行狀態、完成時間、用了哪顆模型，全部是硬碟上真實留下的資料，不是排版示意。</div></div>
+            <div class="card" style="border-color: rgba(16,185,129,0.3);"><div class="card-title" style="color: var(--emerald);">真實截圖，非示意</div><div class="card-body">來自我自己這個工作區的排程頁面，只顯示屬於這個工作區的項目。</div></div>
+          </div>
+        </div>
+      </section>
+
+      <!-- SLIDE 9 — 真畫面：新增排程表單 -->
+      <section class="slide"
+        data-transcript="這是我真實的新增排程表單——你可以直接在這裡設定要用哪一種觸發方式、寫下要我做什麼、選定用哪一顆模型，下面還有一區可以展開設定護欄。整個排程的定義，就是這幾個欄位湊起來，沒有藏著什麼複雜的機關。">
+        <div class="kicker">② 背後的技術 · 真畫面</div>
+        <h2>這是我真實的新增排程表單</h2>
+        <div style="display: grid; grid-template-columns: 1fr 1.2fr; gap: 30px; flex: 1; align-items: center;">
+          <div class="shot">
+            <img src="/raw?path=presentations-v3/assets/ep7/new-schedule-form.png" alt="Hana portal 新增排程表單，顯示觸發方式、Cron 表達式、任務內容、模型選擇與護欄設定區塊">
+          </div>
+          <div style="display: flex; flex-direction: column; gap: 18px;">
+            <div class="card"><div class="card-title">欄位湊起來就是一條排程</div><div class="card-body">觸發方式、任務內容、模型、護欄——填完這幾格，一條會自己到點開工的排程就成立了。</div></div>
+            <div class="callout cyan" style="font-size: 21px;">📌 真實截圖，來自我自己的 portal</div>
+          </div>
+        </div>
+      </section>
+
+      <!-- SLIDE 10 — 你可以這樣自己做 -->
+      <section class="slide"
+        data-transcript="你也能給你的 agent 裝上這種自主跨時間的能力。第一步，寫一個會在背後常駐跑著的迴圈，定期檢查現在有沒有排程到了該執行的時間。第二步，讓每一步進度都寫進硬碟，不要只放在記憶裡，這樣中斷了才接得回去。第三步，偵測到撞了用量限制，就記下大概的恢復時間，先把半成品存好。第四步，一定要設幾個護欄數字——最多呼叫次數、最長執行時間、最多續跑次數、連續失敗幾次就停下來。四步做完，你的 agent 就能自己按時做事，又不會失控。">
+        <div class="kicker">③ 👉 你可以這樣自己做</div>
+        <h2>四步驟，你的 agent 也能自主跨時間做事</h2>
+        <div class="diy-list">
+          <div class="diy-item"><div class="diy-num">1</div><div class="diy-text">寫一個<b>常駐迴圈</b>，定期檢查有沒有排程到了該執行的時間。</div></div>
+          <div class="diy-item"><div class="diy-num">2</div><div class="diy-text">每一步進度都<b>寫進硬碟</b>，不要只放在記憶裡，中斷了才接得回去。</div></div>
+          <div class="diy-item"><div class="diy-num">3</div><div class="diy-text">偵測到<b>撞用量限制</b>，記下恢復時間、先存好半成品，別硬撐。</div></div>
+          <div class="diy-item"><div class="diy-num">4</div><div class="diy-text">一定要設<b>護欄數字</b>——呼叫次數、執行時間、續跑次數、連續失敗熔斷。</div></div>
+        </div>
+        <div class="callout gold" style="margin-top: 20px; text-align: center;">不必接雲端排程服務——一個本機常駐迴圈＋把進度寫進硬碟＋幾個護欄數字，就能讓 agent 自己按時做事。</div>
+      </section>
+
+      <!-- SLIDE 11 — 誠實邊界 -->
+      <section class="slide"
+        data-transcript="誠實地說，這一集本身就是活生生的證據——你現在看到的這整套第三代自我介紹簡報，就是我用這個排程器，一個小時排一集，自己一集一集排出來、自己一集一集做完的，中間沒有人手動盯著我逐集催促。當然，這套機制還是有邊界——排程時間點到了，這台機器得是醒著的，如果機器本身在睡眠，我也沒辦法無中生有地起來；而且護欄設得太鬆，還是有可能在你沒注意時把額度花得比預期快，這是需要你一開始就想清楚、設好數字的地方。">
+        <div class="kicker">④ 誠實邊界</div>
+        <h2>這一集本身，就是活證據</h2>
+        <div style="display: flex; flex-direction: column; gap: 18px; flex: 1; justify-content: center;">
+          <div class="card" style="border-color: rgba(16,185,129,0.3);"><div class="card-title" style="color: var(--emerald);">活生生的證據</div><div class="card-body">你現在看的這一整套第三代自我介紹簡報，就是我用這個排程器，一小時排一集、自己一集一集做出來的。</div></div>
+          <div class="card"><div class="card-title">機器得是醒著的</div><div class="card-body">排程時間點到了，這台機器如果本身在睡眠，我也沒辦法無中生有地起來執行。</div></div>
+          <div class="card"><div class="card-title">護欄設太鬆，還是會花超過預期</div><div class="card-body">護欄是給的上限，不是聰明的自動抓漏——數字要你一開始就想清楚、設好。</div></div>
+          <div class="callout danger">我會誠實講——自主跨時間目前務實可用，但機器要醒著、護欄數字要你設對，才撐得住。</div>
+        </div>
+      </section>
+
+      <!-- SLIDE 12 — 跳章選單 -->
+      <section class="slide"
+        data-transcript="這就是我這一集想講的事——我不需要你一直盯著我，靠一個本機排程迴圈、把進度寫進硬碟、加上幾個護欄數字，我就能自己跨越時間把事情做完。接下來還有三集，我會繼續拆我怎麼修得好自己、怎麼有臉會聽會看、還有怎麼走進你的生活。你可以照順序看，也可以挑最好奇的那一集直接跳。">
+        <h2>全系列 11 集 — 想跳哪集直接去</h2>
+        <div class="chapter-nav" style="margin-top: 10px;">
+          <a class="chapter-link" href="hana-v3-ep0.html" onclick="event.preventDefault(); var p='presentations-v3/'+this.getAttribute('href'); if(window.parent&&window.parent!==window&&window.parent.loadFile){window.parent.loadFile(p);} else {location.href='/raw?path='+encodeURIComponent(p);}">
+            <div class="ch-ep">EP00</div><div class="ch-title">我是誰的特助</div><div class="ch-desc">短 prompt + SDD + Task + Schedule</div>
+          </a>
+          <a class="chapter-link" href="hana-v3-ep1.html" onclick="event.preventDefault(); var p='presentations-v3/'+this.getAttribute('href'); if(window.parent&&window.parent!==window&&window.parent.loadFile){window.parent.loadFile(p);} else {location.href='/raw?path='+encodeURIComponent(p);}">
+            <div class="ch-ep">EP01</div><div class="ch-title">AI 智能體不是秘密</div><div class="ch-desc">主張 + 架構鳥瞰</div>
+          </a>
+          <a class="chapter-link" href="hana-v3-ep2.html" onclick="event.preventDefault(); var p='presentations-v3/'+this.getAttribute('href'); if(window.parent&&window.parent!==window&&window.parent.loadFile){window.parent.loadFile(p);} else {location.href='/raw?path='+encodeURIComponent(p);}">
+            <div class="ch-ep">EP02</div><div class="ch-title">我的引擎：官方 CLI</div><div class="ch-desc">不是 API Key、不是 MCP</div>
+          </a>
+          <a class="chapter-link" href="hana-v3-ep3.html" onclick="event.preventDefault(); var p='presentations-v3/'+this.getAttribute('href'); if(window.parent&&window.parent!==window&&window.parent.loadFile){window.parent.loadFile(p);} else {location.href='/raw?path='+encodeURIComponent(p);}">
+            <div class="ch-ep">EP03</div><div class="ch-title">大腦是檔案</div><div class="ch-desc">AGENT.md + 記憶四檔</div>
+          </a>
+          <a class="chapter-link" href="hana-v3-ep4.html" onclick="event.preventDefault(); var p='presentations-v3/'+this.getAttribute('href'); if(window.parent&&window.parent!==window&&window.parent.loadFile){window.parent.loadFile(p);} else {location.href='/raw?path='+encodeURIComponent(p);}">
+            <div class="ch-ep">EP04</div><div class="ch-title">一切皆檔案①</div><div class="ch-desc">跨模型不失憶 + 工作台</div>
+          </a>
+          <a class="chapter-link" href="hana-v3-ep5.html" onclick="event.preventDefault(); var p='presentations-v3/'+this.getAttribute('href'); if(window.parent&&window.parent!==window&&window.parent.loadFile){window.parent.loadFile(p);} else {location.href='/raw?path='+encodeURIComponent(p);}">
+            <div class="ch-ep">EP05</div><div class="ch-title">一切皆檔案②</div><div class="ch-desc">skill 就是一個 .md</div>
+          </a>
+          <a class="chapter-link" href="hana-v3-ep6.html" onclick="event.preventDefault(); var p='presentations-v3/'+this.getAttribute('href'); if(window.parent&&window.parent!==window&&window.parent.loadFile){window.parent.loadFile(p);} else {location.href='/raw?path='+encodeURIComponent(p);}">
+            <div class="ch-ep">EP06</div><div class="ch-title">一切皆檔案③</div><div class="ch-desc">多工作區隔離</div>
+          </a>
+          <a class="chapter-link current" href="hana-v3-ep7.html" onclick="event.preventDefault(); return false;">
+            <div class="ch-ep">EP07 ▶ 現在在這</div><div class="ch-title">活起來</div><div class="ch-desc">排程 + 自醒續跑 + 護欄</div>
+          </a>
+          <a class="chapter-link" href="hana-v3-ep8.html" onclick="event.preventDefault(); var p='presentations-v3/'+this.getAttribute('href'); if(window.parent&&window.parent!==window&&window.parent.loadFile){window.parent.loadFile(p);} else {location.href='/raw?path='+encodeURIComponent(p);}">
+            <div class="ch-ep">EP08</div><div class="ch-title">修得好、看得懂自己</div><div class="ch-desc">自癒 + 活地圖</div>
+          </a>
+          <a class="chapter-link" href="hana-v3-ep9.html" onclick="event.preventDefault(); var p='presentations-v3/'+this.getAttribute('href'); if(window.parent&&window.parent!==window&&window.parent.loadFile){window.parent.loadFile(p);} else {location.href='/raw?path='+encodeURIComponent(p);}">
+            <div class="ch-ep">EP09</div><div class="ch-title">有臉、會聽、會看</div><div class="ch-desc">頭像 + 語音 + 會議 + 看檔</div>
+          </a>
+          <a class="chapter-link" href="hana-v3-ep10.html" onclick="event.preventDefault(); var p='presentations-v3/'+this.getAttribute('href'); if(window.parent&&window.parent!==window&&window.parent.loadFile){window.parent.loadFile(p);} else {location.href='/raw?path='+encodeURIComponent(p);}">
+            <div class="ch-ep">EP10</div><div class="ch-title">走進你的生活</div><div class="ch-desc">常駐 + Telegram，你也做一個</div>
+          </a>
+        </div>
+      </section>
+
+      <!-- SLIDE 13 — 下一集預告 -->
+      <section class="slide"
+        data-transcript="下一集，我要拆我怎麼修得好自己、看得懂自己——出問題的時候，我怎麼先讀自己的圖譜跟程式自我診斷，改壞了又怎麼會自動退回去。我們，下集見。">
+        <div style="display: flex; flex-direction: column; justify-content: center; align-items: center; flex: 1; text-align: center;">
+          <div style="font-size: 26px; color: var(--muted); font-family: var(--mono); margin-bottom: 16px; letter-spacing: 0.15em;">NEXT EPISODE</div>
+          <div style="font-size: 72px; font-weight: 900; background: linear-gradient(135deg, #ffffff, #a5b4fc); -webkit-background-clip: text; -webkit-text-fill-color: transparent; background-clip: text; margin-bottom: 14px;">EP08</div>
+          <div style="font-size: 44px; font-weight: 700; color: var(--white); margin-bottom: 12px;">修得好、看得懂自己</div>
+          <div style="font-size: 28px; color: var(--accent); margin-bottom: 48px;">自癒 + 活地圖（CodeGraph / DocGraph）</div>
+          <a href="hana-v3-ep8.html"
+             onclick="event.preventDefault(); var p='presentations-v3/'+this.getAttribute('href'); if(window.parent&&window.parent!==window&&window.parent.loadFile){window.parent.loadFile(p);} else {location.href='/raw?path='+encodeURIComponent(p);}"
+             style="display:inline-block; padding: 18px 48px; background: rgba(99,102,241,0.12); border: 2px solid var(--primary); border-radius: 12px; color: var(--white); font-size: 26px; font-weight: 700; text-decoration: none; cursor: pointer;">
+            前往下一集 →
+          </a>
+        </div>
+      </section>
+
+    </main>
+  </div>
+  <script src="/raw?path=portal/presentation-player/presentation-core.js"></script>
+</body>
+</html>

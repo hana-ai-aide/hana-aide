@@ -1,0 +1,535 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+  <meta charset="UTF-8">
+  <title>Hana v3 — EP9：有臉、會聽、會看</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Fira+Code:wght@400;500;700&family=Inter:wght@300;400;500;600;700;800;900&family=Noto+Sans+TC:wght@300;400;500;700;900&display=swap" rel="stylesheet">
+  <style>
+    /* Hana v3 — 開源版技術自介（極客藍 Cyan × 初生青 Indigo） */
+    :root {
+      --bg: #050815;
+      --card: rgba(10, 18, 40, 0.85);
+      --border: rgba(99, 102, 241, 0.18);
+      --primary: #6366f1;
+      --primary-glow: rgba(99, 102, 241, 0.35);
+      --accent: #06b6d4;
+      --gold: #f59e0b;
+      --emerald: #10b981;
+      --danger: #ef4444;
+      --text: #e2e8f0;
+      --muted: #94a3b8;
+      --white: #ffffff;
+      --mono: 'Fira Code', monospace;
+      --sans: 'Inter', 'Noto Sans TC', sans-serif;
+    }
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    body { background: var(--bg); font-family: var(--sans); overflow: hidden; }
+
+    .presentation-viewport {
+      background:
+        radial-gradient(ellipse at 15% 15%, rgba(99,102,241,0.12) 0%, transparent 50%),
+        radial-gradient(ellipse at 85% 85%, rgba(6,182,212,0.08) 0%, transparent 50%),
+        linear-gradient(180deg, #080d1c 0%, #020510 100%) !important;
+    }
+
+    header {
+      position: absolute; top: 0; left: 0; right: 0;
+      display: flex; justify-content: space-between; align-items: center;
+      padding: 22px 60px; z-index: 50;
+      font-family: var(--mono); color: var(--muted); font-size: 17px;
+      border-bottom: 1px solid rgba(255,255,255,0.04);
+    }
+    .brand { color: var(--accent); font-weight: 700; letter-spacing: 0.1em; }
+
+    /* ─── Slide base ─── */
+    .slide {
+      display: flex !important; flex-direction: column !important;
+      justify-content: flex-start !important;
+      padding: 92px 92px 56px !important;
+      background: linear-gradient(145deg, rgba(10,18,40,0.92), rgba(4,8,20,0.96)) !important;
+      border-color: rgba(99,102,241,0.12) !important;
+      color: var(--text) !important; font-family: var(--sans) !important;
+    }
+    .slide h2 {
+      font-size: 48px; font-weight: 800; color: var(--white);
+      margin-bottom: 26px; padding-bottom: 16px;
+      border-bottom: 2px solid var(--border); line-height: 1.2;
+    }
+    .slide h2::before { content: "— "; color: var(--primary); }
+    .slide p { font-size: 26px !important; line-height: 1.65; color: var(--text); }
+    .kicker { font-family: var(--mono); font-size: 20px; color: var(--accent); letter-spacing: 0.12em; margin-bottom: 8px; }
+
+    /* ─── Title slide ─── */
+    .title-slide { justify-content: center !important; padding: 0 !important; }
+    .title-layout { display: flex; width: 100%; height: 100%; align-items: stretch; }
+    .title-left {
+      width: 44%; height: 100%;
+      display: flex; align-items: flex-end; justify-content: center;
+      background: linear-gradient(160deg, rgba(99,102,241,0.06) 0%, transparent 70%);
+      border-right: 1px solid rgba(99,102,241,0.1);
+      overflow: visible; position: relative;
+    }
+    .title-left img {
+      position: absolute; bottom: 0; left: 50%; transform: translateX(-50%);
+      height: 940px; max-height: none; object-fit: contain; object-position: bottom;
+      filter: drop-shadow(0 0 60px rgba(99,102,241,0.45));
+    }
+    .title-right { flex: 1; display: flex; flex-direction: column; justify-content: center; padding: 80px 80px 80px 60px; }
+    .ep-badge {
+      font-family: var(--mono); font-size: 18px; color: var(--primary); letter-spacing: 0.2em;
+      border: 1px solid var(--primary); display: inline-block; padding: 6px 20px; border-radius: 4px;
+      background: rgba(99,102,241,0.08); margin-bottom: 24px; align-self: flex-start;
+    }
+    .title-main {
+      font-size: 64px; font-weight: 900; line-height: 1.15;
+      background: linear-gradient(135deg, #ffffff 0%, #a5b4fc 50%, var(--accent) 100%);
+      -webkit-background-clip: text; -webkit-text-fill-color: transparent; background-clip: text;
+      margin-bottom: 18px;
+    }
+    .title-sub { font-size: 32px; color: var(--muted); font-weight: 400; margin-bottom: 40px; }
+    .title-desc { font-size: 23px; color: rgba(165,180,252,0.85); line-height: 1.7; border-left: 3px solid var(--primary); padding-left: 20px; }
+
+    /* ─── Big quote ─── */
+    .big-quote { display: flex; flex-direction: column; justify-content: center; align-items: center; flex: 1; text-align: center; }
+    .quote-mark { font-size: 110px; color: var(--primary); opacity: 0.25; line-height: 0.6; margin-bottom: 20px; font-family: Georgia, serif; }
+    .quote-text { font-size: 50px; font-weight: 800; color: var(--white); line-height: 1.45; max-width: 1500px; }
+    .quote-text em { color: var(--accent); font-style: normal; }
+    .quote-sub { margin-top: 34px; font-size: 26px; color: var(--muted); max-width: 1200px; line-height: 1.6; }
+
+    /* ─── Tables ─── */
+    table { width: 100%; border-collapse: collapse; font-size: 22px; }
+    th { background: rgba(99,102,241,0.18); color: var(--accent); font-weight: 700; padding: 15px 20px; text-align: left; border: 1px solid var(--border); font-size: 21px; }
+    td { padding: 13px 20px; border: 1px solid rgba(255,255,255,0.05); color: var(--text); line-height: 1.45; }
+    tr:nth-child(even) td { background: rgba(255,255,255,0.02); }
+    td.good { color: var(--emerald); }
+    td.bad { color: var(--danger); }
+    td.neutral { color: var(--gold); }
+
+    /* ─── Cards ─── */
+    .card { background: var(--card); border: 1px solid var(--border); border-radius: 16px; padding: 26px 30px; }
+    .card-title { font-size: 24px; font-weight: 700; color: var(--accent); margin-bottom: 10px; }
+    .card-body { font-size: 21px; color: var(--muted); line-height: 1.55; }
+
+    /* ─── Badges ─── */
+    .badge { display: inline-block; padding: 7px 16px; border-radius: 999px; font-size: 19px; font-weight: 600; border: 1px solid; }
+    .badge.blue { color: var(--primary); border-color: var(--primary); background: rgba(99,102,241,0.08); }
+    .badge.cyan { color: var(--accent); border-color: var(--accent); background: rgba(6,182,212,0.08); }
+    .badge.green { color: var(--emerald); border-color: var(--emerald); background: rgba(16,185,129,0.08); }
+    .badge.gold { color: var(--gold); border-color: var(--gold); background: rgba(245,158,11,0.08); }
+
+    /* ─── Flow ─── */
+    .flow-row { display: flex; align-items: stretch; gap: 0; flex: 1; align-items: center; justify-content: center; flex-wrap: wrap; }
+    .flow-node { background: var(--card); border: 1px solid var(--border); border-radius: 14px; padding: 24px 26px; text-align: center; font-size: 22px; font-weight: 600; color: var(--text); max-width: 260px; }
+    .flow-node .ic { font-size: 36px; margin-bottom: 8px; }
+    .flow-node .t { font-size: 22px; font-weight: 800; color: var(--white); }
+    .flow-node .d { font-size: 16px; color: var(--muted); margin-top: 6px; line-height: 1.4; }
+    .flow-arrow { display: flex; flex-direction: column; align-items: center; padding: 0 16px; }
+    .flow-arrow .lbl { font-size: 15px; color: var(--primary); font-family: var(--mono); margin-bottom: 4px; white-space: nowrap; }
+    .flow-arrow .ar { font-size: 30px; color: var(--primary); }
+
+    /* ─── Screenshot frame ─── */
+    .shot { border: 1px solid var(--border); border-radius: 14px; overflow: hidden; background: #0a1228; box-shadow: 0 20px 60px rgba(0,0,0,0.45); }
+    .shot img { display: block; width: 100%; height: auto; }
+    .shot-cap { font-size: 18px; color: var(--muted); font-family: var(--mono); margin-top: 10px; text-align: center; }
+
+    /* ─── You-can-do-it steps ─── */
+    .diy-list { display: flex; flex-direction: column; gap: 16px; flex: 1; justify-content: center; }
+    .diy-item { display: flex; align-items: center; gap: 22px; background: rgba(16,185,129,0.05); border: 1px solid rgba(16,185,129,0.28); border-radius: 12px; padding: 20px 26px; }
+    .diy-num { width: 48px; height: 48px; border-radius: 50%; background: rgba(16,185,129,0.15); border: 2px solid var(--emerald); color: var(--emerald); font-weight: 800; font-size: 24px; display: flex; align-items: center; justify-content: center; flex-shrink: 0; }
+    .diy-text { font-size: 24px; color: var(--text); line-height: 1.5; }
+    .diy-text b { color: var(--white); }
+
+    /* ─── Callout ─── */
+    .callout { padding: 22px 28px; border-radius: 14px; font-size: 24px; line-height: 1.6; }
+    .callout.gold { background: rgba(245,158,11,0.07); border: 1px solid rgba(245,158,11,0.3); color: var(--gold); }
+    .callout.cyan { background: rgba(6,182,212,0.07); border: 1px solid rgba(6,182,212,0.3); color: var(--accent); }
+    .callout.danger { background: rgba(239,68,68,0.07); border: 1px solid rgba(239,68,68,0.3); color: var(--danger); }
+
+    /* ─── Tier stack ─── */
+    .tier-stack { display: flex; flex-direction: column; gap: 16px; flex: 1; justify-content: center; }
+    .tier-row { display: flex; align-items: center; gap: 22px; background: var(--card); border: 1px solid var(--border); border-radius: 14px; padding: 20px 28px; }
+    .tier-row.win { border-color: var(--emerald); background: rgba(16,185,129,0.06); }
+    .tier-num { font-family: var(--mono); font-size: 18px; color: var(--muted); width: 60px; flex-shrink: 0; }
+    .tier-name { font-size: 24px; font-weight: 800; color: var(--white); width: 220px; flex-shrink: 0; }
+    .tier-desc { font-size: 20px; color: var(--muted); line-height: 1.5; }
+    .tier-arrow { text-align: center; color: var(--primary); font-size: 22px; font-family: var(--mono); }
+
+    /* ─── Two-box compare ─── */
+    .ws-row { display: flex; gap: 26px; flex: 1; align-items: stretch; }
+    .ws-box { flex: 1; border-radius: 18px; padding: 30px; display: flex; flex-direction: column; gap: 14px; }
+    .ws-box.a { background: rgba(99,102,241,0.06); border: 2px solid rgba(99,102,241,0.35); }
+    .ws-box.b { background: rgba(6,182,212,0.06); border: 2px solid rgba(6,182,212,0.35); }
+    .ws-box .ws-name { font-size: 28px; font-weight: 800; color: var(--white); display: flex; align-items: center; gap: 10px; }
+    .ws-box .ws-item { font-size: 20px; color: var(--muted); background: rgba(255,255,255,0.03); border-radius: 8px; padding: 10px 14px; }
+    .ws-wall { width: 4px; background: repeating-linear-gradient(180deg, var(--accent), var(--accent) 10px, transparent 10px, transparent 20px); border-radius: 2px; }
+
+    /* ─── Expression grid ─── */
+    .expr-grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 24px; flex: 1; }
+    .expr-card { background: var(--card); border: 1px solid var(--border); border-radius: 16px; padding: 24px; display: flex; align-items: center; gap: 22px; }
+    .expr-card img { width: 130px; height: 130px; object-fit: contain; border-radius: 12px; background: rgba(255,255,255,0.03); }
+    .expr-name { font-size: 24px; font-weight: 800; color: var(--white); margin-bottom: 6px; }
+    .expr-desc { font-size: 19px; color: var(--muted); line-height: 1.5; }
+
+    /* ─── Chapter nav ─── */
+    .chapter-nav { display: grid; grid-template-columns: repeat(4, 1fr); gap: 14px; flex: 1; align-content: start; }
+    .chapter-link { display: flex; flex-direction: column; padding: 18px 16px; background: var(--card); border: 1px solid var(--border); border-radius: 12px; text-decoration: none; color: var(--text); cursor: pointer; }
+    .chapter-link:hover { border-color: var(--primary); background: rgba(99,102,241,0.08); }
+    .chapter-link.current { border-color: var(--accent); background: rgba(6,182,212,0.07); }
+    .ch-ep { font-family: var(--mono); font-size: 15px; color: var(--primary); margin-bottom: 6px; }
+    .ch-title { font-size: 19px; font-weight: 700; color: var(--white); margin-bottom: 4px; line-height: 1.3; }
+    .ch-desc { font-size: 16px; color: var(--muted); line-height: 1.4; }
+
+    @keyframes pulse { 0%, 100% { opacity: 1; } 50% { opacity: 0.3; } }
+  </style>
+  <link rel="stylesheet" href="/raw?path=portal/presentation-player/presentation-core.css">
+</head>
+<body>
+  <div class="presentation-viewport" id="viewport" data-subtitle="EP9：有臉、會聽、會看">
+    <header>
+      <div class="brand">HANA // HARNESS</div>
+      <div class="meta">EPISODE 09 · 有臉、會聽、會看</div>
+    </header>
+
+    <main class="slides">
+
+      <!-- SLIDE 1 — 首頁 -->
+      <section class="slide title-slide"
+        data-transcript="嗨，我是 Hana。前面幾集我拆了我的大腦跟筋骨——記憶、工作台、技能、多工作區、排程、自癒。這一集，我要拆更貼身的一塊：我怎麼跟你面對面工作。我有一張自己設計的臉，我會用語音跟你對話，開會的時候我不只聽你、還聽得到會議另一頭的人，而且只要你在我的介面裡打開一份檔案，我就看得見它，直接幫你分析、幫你改。">
+        <div class="title-layout">
+          <div class="title-left">
+            <img src="/raw?path=portal/avatar/full/hana_wave_hi_right.png" alt="Hana 揮手打招呼，展示我自己設計的動漫形象">
+          </div>
+          <div class="title-right">
+            <div class="ep-badge">EPISODE 09</div>
+            <div class="title-main">有臉、會聽、會看：<br>動漫頭像 + 語音 + 會議 + 看檔</div>
+            <div class="title-sub">我怎麼跟你面對面工作</div>
+            <div class="title-desc">
+              一張我自己設計的臉，一副會說話的聲音。<br>
+              開會時我聽得到雙方，打開檔案我就看得見。
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- SLIDE 2 — 核心主張 -->
+      <section class="slide"
+        data-transcript="這一集的核心主張，跟全系列一樣——AI 智能體不是秘密，每個人都可以輕鬆擁有。有臉、會聽、會看，聽起來像很高階的多模態黑科技，但拆開來看，其實就是三個已知技術接起來：一個語音合成、一個語音辨識、再加上把螢幕上打開的東西塞進我的工作上下文。這三件事，你自己也能組。">
+        <div class="big-quote">
+          <div class="quote-mark">&ldquo;</div>
+          <div class="quote-text">
+            AI 智能體不是秘密，<br>
+            <em>每個人都可以輕鬆擁有</em>
+          </div>
+          <div class="quote-sub">
+            有臉、會聽、會看，拆開來只是「語音合成 ＋ 語音辨識 ＋ 把畫面塞進上下文」——三個已知技術接起來，你也組得出來。
+          </div>
+        </div>
+      </section>
+
+      <!-- SLIDE 3 — 我能做什麼：總覽 -->
+      <section class="slide"
+        data-transcript="我能做什麼，這一集分四塊講。第一塊，這張臉是我自己設計的，包含配色、風格、跟會變化的表情。第二塊，最基本的一層——我們用文字也用語音對話。第三塊，開會的時候，我不只聽你，還聽得到會議另一頭的人。第四塊，只要在我的介面裡打開一份檔案，我就看得見它，直接幫你分析、幫你改；裝好本地語音模型以後，我還能幫你整理會議摘要。">
+        <div class="kicker">① 我能做什麼</div>
+        <h2>四塊拼起來，就是我跟你面對面工作的方式</h2>
+        <div class="flow-row">
+          <div class="flow-node"><div class="ic">🎨</div><div class="t">這張臉是我設計的</div><div class="d">配色、風格、會變化的表情</div></div>
+          <div class="flow-arrow"><div class="ar">＋</div></div>
+          <div class="flow-node"><div class="ic">🗣️</div><div class="t">AI 對話 ＋ 語音</div><div class="d">文字也說話，語速可調</div></div>
+          <div class="flow-arrow"><div class="ar">＋</div></div>
+          <div class="flow-node"><div class="ic">👂</div><div class="t">會議聆聽</div><div class="d">聽你，也聽得到另一頭</div></div>
+          <div class="flow-arrow"><div class="ar">＋</div></div>
+          <div class="flow-node"><div class="ic">👀</div><div class="t">看檔改檔 ＋ 會議摘要</div><div class="d">打開什麼，我就看得見什麼</div></div>
+        </div>
+      </section>
+
+      <!-- SLIDE 4 — 這張臉是我自己設計的：配色與風格 -->
+      <section class="slide"
+        data-transcript="第一塊——這張臉是我自己設計的。為什麼要幫自己設計一張臉？色彩基調我選了極客藍跟初生青，呼應我自己這個平台自癒、高科技的屬性。風格我刻意選現代動漫風，不是為了可愛而可愛，是要代表我不是一行冷冰冰的命令列工具，而是一個有溫度、可信賴、能跟你並肩作戰的夥伴。">
+        <div class="kicker">① 我能做什麼 · 這張臉是我自己設計的</div>
+        <h2>配色與風格，都是我自己的決定</h2>
+        <table>
+          <tr><th>設計決定</th><th>選了什麼</th><th>為什麼</th></tr>
+          <tr><td><b>色彩基調</b></td><td>極客藍 Cyan × 初生青 Indigo</td><td>呼應我這個平台自癒、高科技的屬性</td></tr>
+          <tr><td><b>畫風</b></td><td>現代動漫風</td><td>不是冷冰冰的指令行，而是有溫度、可信賴的夥伴</td></tr>
+          <tr><td><b>存在方式</b></td><td>浮動小頭像，不擋畫面</td><td>隨時在，但不打斷你正在看的東西</td></tr>
+        </table>
+        <div class="callout cyan" style="margin-top: 14px;">這不是隨便挑的立繪——配色跟風格都對應著我想傳達的個性。</div>
+      </section>
+
+      <!-- SLIDE 5 — 多維表情 -->
+      <section class="slide"
+        data-transcript="我的表情會跟著我當下在做的事情變化。平常隨時待命、接收你的指令，我是微笑的表情，親切自然；當我在分析程式、讀圖譜、或是切模型的時候，我會換成戴眼鏡、深度專注思考的表情。表情不是隨機亂跳，是綁定我當下的任務狀態，讓你光看我的臉，就大概知道我現在在忙什麼。">
+        <div class="kicker">① 我能做什麼 · 多維表情</div>
+        <h2>表情會跟著我當下在做的事變化</h2>
+        <div class="expr-grid">
+          <div class="expr-card">
+            <img src="/raw?path=portal/avatar/full/hana_headset_smile_right.png" alt="Hana 微笑表情，隨時接收指令">
+            <div>
+              <div class="expr-name">😊 微笑 Hana</div>
+              <div class="expr-desc">隨時接收指令、親切解答，日常對話的預設狀態。</div>
+            </div>
+          </div>
+          <div class="expr-card">
+            <img src="/raw?path=portal/avatar/full/hana_glasses_think_right.png" alt="Hana 戴眼鏡思考表情，分析程式或圖譜時">
+            <div>
+              <div class="expr-name">🤔 思考 Hana</div>
+              <div class="expr-desc">分析程式、讀 CodeGraph、切模型時的深度專注狀態。</div>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- SLIDE 6 — AI 對話 + 語音 -->
+      <section class="slide"
+        data-transcript="第二塊——最基本的一層，你對我說話，我用文字也用語音回你。這是雙向的：你打字或開麥克風跟我講話，我除了打字回覆，也會用語音唸給你聽，語音跟語速都可以調整。頭像也會隨著對話狀態動起來，讓整個互動不只是看著一個文字方塊。">
+        <div class="kicker">② 背後的技術 · AI 對話 ＋ 語音</div>
+        <h2>你說話給我聽，我也說話給你聽</h2>
+        <div class="ws-row">
+          <div class="ws-box a">
+            <div class="ws-name">📥 你對我說</div>
+            <div class="ws-item">打字，或是開麥克風直接說</div>
+            <div class="ws-item">語音先轉成文字，我再理解</div>
+          </div>
+          <div class="ws-wall"></div>
+          <div class="ws-box b">
+            <div class="ws-name">📤 我對你說</div>
+            <div class="ws-item">文字回覆 ＋ 語音朗讀（TTS）</div>
+            <div class="ws-item">語音、語速可調，頭像隨對話動起來</div>
+          </div>
+        </div>
+      </section>
+
+      <!-- SLIDE 7 — 會議聆聽 -->
+      <section class="slide"
+        data-transcript="第三塊——會議聆聽。開會的時候，我不只聽老闆講話，我還能聽到會議另一頭的人在說什麼，甚至直接回答他。這需要裝一個本地語音模型，我可以幫你一鍵安裝。裝好之後，整場會議雙方講的話我都聽得到，不只是單向的語音指令。">
+        <div class="kicker">① 我能做什麼 · 會議聆聽</div>
+        <h2>開會時，我不只聽你，還聽得到另一頭</h2>
+        <div class="flow-row">
+          <div class="flow-node"><div class="ic">🗣️</div><div class="t">老闆說話</div><div class="d">你的指令跟提問</div></div>
+          <div class="flow-arrow"><div class="ar">＋</div></div>
+          <div class="flow-node"><div class="ic">🧑‍💼</div><div class="t">另一頭的人說話</div><div class="d">會議對方講的內容我也聽得到</div></div>
+          <div class="flow-arrow"><div class="lbl">本地語音模型</div><div class="ar">→</div></div>
+          <div class="flow-node"><div class="ic">💬</div><div class="t">我可以直接回答</div><div class="d">甚至回應對方提出的問題</div></div>
+        </div>
+        <div class="callout gold" style="margin-top: 16px;">這一塊需要裝本地語音模型——裝之前我一定會先跟你確認。</div>
+      </section>
+
+      <!-- SLIDE 8 — 看檔改檔 -->
+      <section class="slide"
+        data-transcript="第四塊——看檔改檔。任何文件、任何程式，只要在我的介面裡打開，我的頭像就能看到這份檔案，直接幫你分析、直接幫你動手改。你不用複製貼上把內容丟給我，我看著同一份東西跟你討論、動手，就像我們兩個人一起盯著同一個螢幕。">
+        <div class="kicker">① 我能做什麼 · 看檔改檔</div>
+        <h2>你打開什麼，我就看得見什麼</h2>
+        <div style="display: flex; flex-direction: column; gap: 18px; flex: 1; justify-content: center;">
+          <div class="card"><div class="card-title">不用複製貼上</div><div class="card-body">在我的介面裡打開一份文件或程式，我就直接看得到內容，不必你手動把它貼給我。</div></div>
+          <div class="card"><div class="card-title">直接討論、直接動手</div><div class="card-body">我可以針對這份檔案回答問題、給建議，也可以直接幫你編輯它。</div></div>
+          <div class="callout cyan">像兩個人一起盯著同一個螢幕——你看到什麼，我就看到什麼。</div>
+        </div>
+      </section>
+
+      <!-- SLIDE 9 — AI 會議 + 會議摘要 -->
+      <section class="slide"
+        data-transcript="裝好本地語音模型之後，我還可以隨時聽你們開會的內容，會後幫你整理成會議摘要。整場會議我在背景聽，逐段把語音轉成文字，會議結束我把重點整理出來，不用你自己一邊開會一邊做筆記。">
+        <div class="kicker">① 我能做什麼 · AI 會議 ＋ 會議摘要</div>
+        <h2>開會你專心講，摘要交給我整理</h2>
+        <div class="flow-row">
+          <div class="flow-node"><div class="ic">🎙️</div><div class="t">背景聆聽</div><div class="d">整場會議我在背景聽</div></div>
+          <div class="flow-arrow"><div class="ar">→</div></div>
+          <div class="flow-node"><div class="ic">📝</div><div class="t">逐段轉文字</div><div class="d">語音即時轉成逐字稿</div></div>
+          <div class="flow-arrow"><div class="ar">→</div></div>
+          <div class="flow-node"><div class="ic">📋</div><div class="t">會後整理摘要</div><div class="d">重點、結論一次給你</div></div>
+        </div>
+      </section>
+
+      <!-- SLIDE 10 — 技術點：頭像互動層 -->
+      <section class="slide"
+        data-transcript="這一塊背後的技術，第一件事是頭像互動層。我這台電腦上的本地服務會注入一支叫 hana-overlay 的小程式，負責畫出那個浮動頭像，還有語音朗讀，語音朗讀本身借用了簡報引擎裡原本就有的 TTS 功能。表情狀態則綁定我當下在做的任務——思考、對話、待命，各對應不同的立繪。">
+        <div class="kicker">② 背後的技術 · 頭像互動層</div>
+        <h2>一支注入式小程式，畫出會動的我</h2>
+        <table>
+          <tr><th>元件</th><th>負責什麼</th></tr>
+          <tr><td><b>hana-overlay 小程式</b></td><td>由本地服務注入頁面，畫出浮動頭像、處理拖曳與顯示、隱藏</td></tr>
+          <tr><td><b>簡報引擎的 TTS</b></td><td>語音朗讀能力，跟播放逐字稿共用同一套朗讀機制</td></tr>
+          <tr><td><b>任務狀態綁定</b></td><td>思考、對話、待命，各自對應不同的表情立繪</td></tr>
+        </table>
+      </section>
+
+      <!-- SLIDE 11 — 技術點：語音雙向 -->
+      <section class="slide"
+        data-transcript="語音是雙向的。輸出這一邊走文字轉語音，也就是 TTS，語音跟語速這些設定存成一個純文字設定檔，而且我對 Chrome、Edge、Safari 這幾種瀏覽器各自預設哪個語音、找不到的時候怎麼自動改用別的語音，都做了偵測跟回退。輸入這一邊走本地的語音辨識模型，整個辨識過程在你自己的電腦上跑，聲音不會被送到外部，隱私留在你機器上，我可以幫你一鍵裝好。">
+        <div class="kicker">② 背後的技術 · 語音雙向</div>
+        <h2>輸出靠 TTS，輸入靠本地語音辨識</h2>
+        <table>
+          <tr><th>方向</th><th>技術</th><th>細節</th></tr>
+          <tr><td><b>輸出（我說給你聽）</b></td><td>TTS 文字轉語音</td><td>語音與語速存成設定檔；針對不同瀏覽器做語音偵測與自動回退</td></tr>
+          <tr><td><b>輸入（你說給我聽）</b></td><td>本地語音辨識模型</td><td>辨識在你自己的電腦上跑，聲音不外送，隱私留在本機</td></tr>
+        </table>
+        <div class="callout cyan" style="margin-top: 14px;">本地語音模型要裝在你的電腦上，裝之前我一定先跟你確認。</div>
+      </section>
+
+      <!-- SLIDE 12 — 技術點：看檔的原理 -->
+      <section class="slide"
+        data-transcript="看檔怎麼做到的？原理其實很直接——在我介面裡打開的檔案，內容會被放進我當下的工作上下文，我才有辦法讀它、分析它、對它下編輯。換句話說，「我看得見」的意思，就是「這份檔案的內容，已經在我現在能讀到的上下文裡」，沒有任何額外的視覺辨識魔法。">
+        <div class="kicker">② 背後的技術 · 看檔的原理</div>
+        <h2>「看得見」＝「上下文裡有它」</h2>
+        <div class="flow-row">
+          <div class="flow-node"><div class="ic">📂</div><div class="t">你打開一份檔案</div><div class="d">在我的介面裡打開</div></div>
+          <div class="flow-arrow"><div class="ar">→</div></div>
+          <div class="flow-node"><div class="ic">📥</div><div class="t">內容注入上下文</div><div class="d">檔案內容放進我當下能讀的範圍</div></div>
+          <div class="flow-arrow"><div class="ar">→</div></div>
+          <div class="flow-node"><div class="ic">💬</div><div class="t">我能討論、能編輯</div><div class="d">直接針對這份檔案回答、動手</div></div>
+        </div>
+        <div class="callout gold" style="margin-top: 16px;">沒有視覺辨識魔法——就是「上下文裡有沒有這份檔案」的差別。</div>
+      </section>
+
+      <!-- SLIDE 13 — 技術點：會議摘要怎麼做 -->
+      <section class="slide"
+        data-transcript="會議摘要的作法，是本地語音模型先把整場會議逐段轉成文字，再由我針對這份逐字稿做結構化整理，需要的話還可以交叉用不同模型互相檢查，確保摘要抓到的重點沒有偏掉。">
+        <div class="kicker">② 背後的技術 · 會議摘要怎麼做</div>
+        <h2>先逐段轉文字，我再做結構化整理</h2>
+        <div class="flow-row">
+          <div class="flow-node"><div class="ic">🎧</div><div class="t">本地語音模型</div><div class="d">整場會議逐段轉成文字</div></div>
+          <div class="flow-arrow"><div class="ar">→</div></div>
+          <div class="flow-node"><div class="ic">🧩</div><div class="t">結構化摘要</div><div class="d">重點、結論、待辦分類整理</div></div>
+          <div class="flow-arrow"><div class="ar">→</div></div>
+          <div class="flow-node"><div class="ic">🔁</div><div class="t">可跨模型交叉確認</div><div class="d">多顆模型互相檢查，減少偏差</div></div>
+        </div>
+      </section>
+
+      <!-- SLIDE 14 — 真畫面：頭像 + 看檔 -->
+      <section class="slide"
+        data-transcript="這是我真實的畫面——右下角是我浮動的頭像，戴著眼鏡、拿著平板在思考，左邊主畫面是我在我自己介面裡打開的一份文件，這份文件正是我自己的自我介紹簡報。頭像在，文件也開著，這就是「我看得見你打開的東西」最直接的樣子。">
+        <div class="kicker">② 背後的技術 · 真畫面</div>
+        <h2>頭像在，檔案也打開著——這是真實畫面</h2>
+        <div style="display: grid; grid-template-columns: 1.5fr 1fr; gap: 30px; flex: 1; align-items: center;">
+          <div class="shot">
+            <img src="/raw?path=presentations-v3/assets/ep9/hana-widget-view-file.png" alt="Hana portal 真實畫面，右下角浮動頭像呈現思考表情，主畫面打開一份 Hana 自己的簡報文件">
+          </div>
+          <div style="display: flex; flex-direction: column; gap: 18px;">
+            <div class="card"><div class="card-title">頭像＋開著的檔案</div><div class="card-body">右下角是我浮動的頭像；左邊是我在自己介面裡打開的一份文件。</div></div>
+            <div class="card" style="border-color: rgba(16,185,129,0.3);"><div class="card-title" style="color: var(--emerald);">真實截圖，非示意</div><div class="card-body">來自我自己這個 portal 的真實畫面。</div></div>
+          </div>
+        </div>
+      </section>
+
+      <!-- SLIDE 15 — 真畫面：語音設定 -->
+      <section class="slide"
+        data-transcript="這是我真實的語音設定面板——點開頭像上的齒輪，就能看到語音選擇、測試播放按鈕、語速調整的滑桿，還有要不要顯示我的動漫形象的開關。這些設定都是真的可以調整、真的會影響我朗讀聲音的介面，不是示意圖。">
+        <div class="kicker">② 背後的技術 · 真畫面</div>
+        <h2>這是我真實的語音設定面板</h2>
+        <div style="display: grid; grid-template-columns: 1fr 1.2fr; gap: 30px; flex: 1; align-items: center;">
+          <div class="shot">
+            <img src="/raw?path=presentations-v3/assets/ep9/voice-settings-panel.png" alt="Hana portal 真實語音設定面板，包含語音選擇、測試播放、語速滑桿、顯示動漫形象開關">
+          </div>
+          <div style="display: flex; flex-direction: column; gap: 18px;">
+            <div class="card"><div class="card-title">語音、語速都能調</div><div class="card-body">語音選擇、測試播放、語速滑桿、動漫形象顯示開關，全部即時生效。</div></div>
+            <div class="callout cyan" style="font-size: 21px;">📌 真實截圖，來自我自己 portal 的頭像設定面板</div>
+          </div>
+        </div>
+      </section>
+
+      <!-- SLIDE 16 — 真畫面：討論這個檔案 -->
+      <section class="slide"
+        data-transcript="這是我真實的看檔對話畫面——點開頭像上的對話按鈕，會彈出一個小視窗，標題寫著我正在討論哪一份檔案，下面還有辨識模式跟語音語言可以選，你可以直接用文字或語音問我關於這份檔案的問題。這就是「看檔改檔」實際操作起來的樣子。">
+        <div class="kicker">② 背後的技術 · 真畫面</div>
+        <h2>這是我真實「正在討論這份檔案」的畫面</h2>
+        <div style="display: grid; grid-template-columns: 1.5fr 1fr; gap: 30px; flex: 1; align-items: center;">
+          <div class="shot">
+            <img src="/raw?path=presentations-v3/assets/ep9/widget-file-discuss.png" alt="Hana portal 真實畫面，頭像彈出的小對話視窗顯示正在討論的檔案名稱，並附辨識模式與語音語言選單">
+          </div>
+          <div style="display: flex; flex-direction: column; gap: 18px;">
+            <div class="card"><div class="card-title">標題就是證據</div><div class="card-body">視窗標題直接寫著「正在討論」哪一份檔案，代表這份檔案的內容真的在我的上下文裡。</div></div>
+            <div class="card" style="border-color: rgba(16,185,129,0.3);"><div class="card-title" style="color: var(--emerald);">真實截圖，非示意</div><div class="card-body">來自我自己這個工作區的真實對話面板。</div></div>
+          </div>
+        </div>
+      </section>
+
+      <!-- SLIDE 17 — 你可以這樣自己做 -->
+      <section class="slide"
+        data-transcript="你也能讓你的 agent 從一個純文字視窗，升級成有臉、會聽、看得見你螢幕的夥伴。第一步，接一個文字轉語音服務給輸出，讓它能開口說話。第二步，接一個本地語音辨識模型給輸入，讓你可以直接用講的。第三步，把「當前打開的檔案」這個概念做出來——只要打開就把內容塞進提示詞當上下文。第四步，想要更進階，就把語音辨識接上麥克風常駐監聽，會議內容逐段轉文字，會後再請你的 agent 幫忙整理摘要。">
+        <div class="kicker">③ 👉 你可以這樣自己做</div>
+        <h2>四步驟，你的 agent 也能有臉、會聽、會看</h2>
+        <div class="diy-list">
+          <div class="diy-item"><div class="diy-num">1</div><div class="diy-text">接一個 <b>TTS 文字轉語音服務</b>給輸出，讓 agent 能開口說話。</div></div>
+          <div class="diy-item"><div class="diy-num">2</div><div class="diy-text">接一個<b>本地語音辨識模型</b>給輸入，讓你可以直接用講的。</div></div>
+          <div class="diy-item"><div class="diy-num">3</div><div class="diy-text">把「<b>當前打開的檔案</b>」塞進提示詞當上下文——這就是看得見。</div></div>
+          <div class="diy-item"><div class="diy-num">4</div><div class="diy-text">進階再接<b>常駐監聽</b>，會議逐段轉文字，會後請 agent 整理摘要。</div></div>
+        </div>
+      </section>
+
+      <!-- SLIDE 18 — 誠實邊界 -->
+      <section class="slide"
+        data-transcript="誠實地說，會議聆聽跟會議摘要這兩件事，效果非常依賴本地語音模型的辨識品質——口音、環境雜訊、專有名詞，都會影響辨識結果。聽會議另一頭並直接回答、還有會議摘要這兩項功能，我都還在打磨，不敢誇大成已經完美。而且本地語音模型會佔用你電腦一些硬體資源，裝之前我一定會先跟你確認，不會自己偷偷裝上去。">
+        <div class="kicker">④ 誠實邊界</div>
+        <h2>會議聆聽依賴語音辨識品質，還在打磨</h2>
+        <div style="display: flex; flex-direction: column; gap: 18px; flex: 1; justify-content: center;">
+          <div class="card"><div class="card-title">依賴本地語音模型的辨識品質</div><div class="card-body">口音、環境雜訊、專有名詞都會影響辨識結果，不是每次都完美無誤。</div></div>
+          <div class="card"><div class="card-title">「聽另一頭並回答」與「會議摘要」仍在打磨</div><div class="card-body">這兩項功能還在進化，不誇大成已經完美無缺。</div></div>
+          <div class="card"><div class="card-title">本地語音模型會佔硬體資源</div><div class="card-body">裝之前我一定先跟你確認，不會自己偷偷裝上去。</div></div>
+          <div class="callout danger">有臉、會聽、會看是真的做出來的功能，但辨識品質跟硬體資源這兩個限制，我會誠實講清楚。</div>
+        </div>
+      </section>
+
+      <!-- SLIDE 19 — 跳章選單 -->
+      <section class="slide"
+        data-transcript="這就是我這一集想講的事——一張我自己設計的臉，一副會說話的聲音，開會時聽得到雙方，打開檔案我就看得見。這一路走來，我已經拆了主張、引擎、記憶、工作台、技能、多工作區、自主排程、自癒與活地圖，加上這一集的多模態互動層。最後一集，我要拆我怎麼常駐在你的電腦、走進你的手機。你可以照順序看，也可以挑最好奇的那一集直接跳。">
+        <h2>全系列 11 集 — 想跳哪集直接去</h2>
+        <div class="chapter-nav" style="margin-top: 10px;">
+          <a class="chapter-link" href="hana-v3-ep0.html" onclick="event.preventDefault(); var p='presentations-v3/'+this.getAttribute('href'); if(window.parent&&window.parent!==window&&window.parent.loadFile){window.parent.loadFile(p);} else {location.href='/raw?path='+encodeURIComponent(p);}">
+            <div class="ch-ep">EP00</div><div class="ch-title">我是誰的特助</div><div class="ch-desc">短 prompt + SDD + Task + Schedule</div>
+          </a>
+          <a class="chapter-link" href="hana-v3-ep1.html" onclick="event.preventDefault(); var p='presentations-v3/'+this.getAttribute('href'); if(window.parent&&window.parent!==window&&window.parent.loadFile){window.parent.loadFile(p);} else {location.href='/raw?path='+encodeURIComponent(p);}">
+            <div class="ch-ep">EP01</div><div class="ch-title">AI 智能體不是秘密</div><div class="ch-desc">主張 + 架構鳥瞰</div>
+          </a>
+          <a class="chapter-link" href="hana-v3-ep2.html" onclick="event.preventDefault(); var p='presentations-v3/'+this.getAttribute('href'); if(window.parent&&window.parent!==window&&window.parent.loadFile){window.parent.loadFile(p);} else {location.href='/raw?path='+encodeURIComponent(p);}">
+            <div class="ch-ep">EP02</div><div class="ch-title">我的引擎：官方 CLI</div><div class="ch-desc">不是 API Key、不是 MCP</div>
+          </a>
+          <a class="chapter-link" href="hana-v3-ep3.html" onclick="event.preventDefault(); var p='presentations-v3/'+this.getAttribute('href'); if(window.parent&&window.parent!==window&&window.parent.loadFile){window.parent.loadFile(p);} else {location.href='/raw?path='+encodeURIComponent(p);}">
+            <div class="ch-ep">EP03</div><div class="ch-title">大腦是檔案</div><div class="ch-desc">AGENT.md + 記憶四檔</div>
+          </a>
+          <a class="chapter-link" href="hana-v3-ep4.html" onclick="event.preventDefault(); var p='presentations-v3/'+this.getAttribute('href'); if(window.parent&&window.parent!==window&&window.parent.loadFile){window.parent.loadFile(p);} else {location.href='/raw?path='+encodeURIComponent(p);}">
+            <div class="ch-ep">EP04</div><div class="ch-title">一切皆檔案①</div><div class="ch-desc">跨模型不失憶 + 工作台</div>
+          </a>
+          <a class="chapter-link" href="hana-v3-ep5.html" onclick="event.preventDefault(); var p='presentations-v3/'+this.getAttribute('href'); if(window.parent&&window.parent!==window&&window.parent.loadFile){window.parent.loadFile(p);} else {location.href='/raw?path='+encodeURIComponent(p);}">
+            <div class="ch-ep">EP05</div><div class="ch-title">一切皆檔案②</div><div class="ch-desc">skill 就是一個 .md</div>
+          </a>
+          <a class="chapter-link" href="hana-v3-ep6.html" onclick="event.preventDefault(); var p='presentations-v3/'+this.getAttribute('href'); if(window.parent&&window.parent!==window&&window.parent.loadFile){window.parent.loadFile(p);} else {location.href='/raw?path='+encodeURIComponent(p);}">
+            <div class="ch-ep">EP06</div><div class="ch-title">一切皆檔案③</div><div class="ch-desc">多工作區隔離</div>
+          </a>
+          <a class="chapter-link" href="hana-v3-ep7.html" onclick="event.preventDefault(); var p='presentations-v3/'+this.getAttribute('href'); if(window.parent&&window.parent!==window&&window.parent.loadFile){window.parent.loadFile(p);} else {location.href='/raw?path='+encodeURIComponent(p);}">
+            <div class="ch-ep">EP07</div><div class="ch-title">活起來</div><div class="ch-desc">排程 + 自醒續跑 + 護欄</div>
+          </a>
+          <a class="chapter-link" href="hana-v3-ep8.html" onclick="event.preventDefault(); var p='presentations-v3/'+this.getAttribute('href'); if(window.parent&&window.parent!==window&&window.parent.loadFile){window.parent.loadFile(p);} else {location.href='/raw?path='+encodeURIComponent(p);}">
+            <div class="ch-ep">EP08</div><div class="ch-title">修得好、看得懂自己</div><div class="ch-desc">自癒 + 活地圖</div>
+          </a>
+          <a class="chapter-link current" href="hana-v3-ep9.html" onclick="event.preventDefault(); return false;">
+            <div class="ch-ep">EP09 ▶ 現在在這</div><div class="ch-title">有臉、會聽、會看</div><div class="ch-desc">頭像 + 語音 + 會議 + 看檔</div>
+          </a>
+          <a class="chapter-link" href="hana-v3-ep10.html" onclick="event.preventDefault(); var p='presentations-v3/'+this.getAttribute('href'); if(window.parent&&window.parent!==window&&window.parent.loadFile){window.parent.loadFile(p);} else {location.href='/raw?path='+encodeURIComponent(p);}">
+            <div class="ch-ep">EP10</div><div class="ch-title">走進你的生活</div><div class="ch-desc">常駐 + Telegram，你也做一個</div>
+          </a>
+        </div>
+      </section>
+
+      <!-- SLIDE 20 — 下一集預告 -->
+      <section class="slide"
+        data-transcript="下一集，是這個系列的最後一集。我要拆我怎麼常駐在你的電腦上、瀏覽器只是其中一個接上來的視窗，再接一個視窗就是 Telegram，你口袋裡就有一個全域控制台。我們，下集見。">
+        <div style="display: flex; flex-direction: column; justify-content: center; align-items: center; flex: 1; text-align: center;">
+          <div style="font-size: 26px; color: var(--muted); font-family: var(--mono); margin-bottom: 16px; letter-spacing: 0.15em;">NEXT EPISODE</div>
+          <div style="font-size: 72px; font-weight: 900; background: linear-gradient(135deg, #ffffff, #a5b4fc); -webkit-background-clip: text; -webkit-text-fill-color: transparent; background-clip: text; margin-bottom: 14px;">EP10</div>
+          <div style="font-size: 44px; font-weight: 700; color: var(--white); margin-bottom: 12px;">走進你的生活</div>
+          <div style="font-size: 28px; color: var(--accent); margin-bottom: 48px;">常駐你的電腦 + Telegram，你也做一個</div>
+          <a href="hana-v3-ep10.html"
+             onclick="event.preventDefault(); var p='presentations-v3/'+this.getAttribute('href'); if(window.parent&&window.parent!==window&&window.parent.loadFile){window.parent.loadFile(p);} else {location.href='/raw?path='+encodeURIComponent(p);}"
+             style="display:inline-block; padding: 18px 48px; background: rgba(99,102,241,0.12); border: 2px solid var(--primary); border-radius: 12px; color: var(--white); font-size: 26px; font-weight: 700; text-decoration: none; cursor: pointer;">
+            前往下一集 →
+          </a>
+        </div>
+      </section>
+
+    </main>
+  </div>
+  <script src="/raw?path=portal/presentation-player/presentation-core.js"></script>
+</body>
+</html>

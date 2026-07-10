@@ -1,0 +1,454 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+  <meta charset="UTF-8">
+  <title>Hana v3 — EP6：一切皆檔案③</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Fira+Code:wght@400;500;700&family=Inter:wght@300;400;500;600;700;800;900&family=Noto+Sans+TC:wght@300;400;500;700;900&display=swap" rel="stylesheet">
+  <style>
+    /* Hana v3 — 開源版技術自介（極客藍 Cyan × 初生青 Indigo） */
+    :root {
+      --bg: #050815;
+      --card: rgba(10, 18, 40, 0.85);
+      --border: rgba(99, 102, 241, 0.18);
+      --primary: #6366f1;
+      --primary-glow: rgba(99, 102, 241, 0.35);
+      --accent: #06b6d4;
+      --gold: #f59e0b;
+      --emerald: #10b981;
+      --danger: #ef4444;
+      --text: #e2e8f0;
+      --muted: #94a3b8;
+      --white: #ffffff;
+      --mono: 'Fira Code', monospace;
+      --sans: 'Inter', 'Noto Sans TC', sans-serif;
+    }
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    body { background: var(--bg); font-family: var(--sans); overflow: hidden; }
+
+    .presentation-viewport {
+      background:
+        radial-gradient(ellipse at 15% 15%, rgba(99,102,241,0.12) 0%, transparent 50%),
+        radial-gradient(ellipse at 85% 85%, rgba(6,182,212,0.08) 0%, transparent 50%),
+        linear-gradient(180deg, #080d1c 0%, #020510 100%) !important;
+    }
+
+    header {
+      position: absolute; top: 0; left: 0; right: 0;
+      display: flex; justify-content: space-between; align-items: center;
+      padding: 22px 60px; z-index: 50;
+      font-family: var(--mono); color: var(--muted); font-size: 17px;
+      border-bottom: 1px solid rgba(255,255,255,0.04);
+    }
+    .brand { color: var(--accent); font-weight: 700; letter-spacing: 0.1em; }
+
+    /* ─── Slide base ─── */
+    .slide {
+      display: flex !important; flex-direction: column !important;
+      justify-content: flex-start !important;
+      padding: 92px 92px 56px !important;
+      background: linear-gradient(145deg, rgba(10,18,40,0.92), rgba(4,8,20,0.96)) !important;
+      border-color: rgba(99,102,241,0.12) !important;
+      color: var(--text) !important; font-family: var(--sans) !important;
+    }
+    .slide h2 {
+      font-size: 48px; font-weight: 800; color: var(--white);
+      margin-bottom: 26px; padding-bottom: 16px;
+      border-bottom: 2px solid var(--border); line-height: 1.2;
+    }
+    .slide h2::before { content: "— "; color: var(--primary); }
+    .slide p { font-size: 26px !important; line-height: 1.65; color: var(--text); }
+    .kicker { font-family: var(--mono); font-size: 20px; color: var(--accent); letter-spacing: 0.12em; margin-bottom: 8px; }
+
+    /* ─── Title slide ─── */
+    .title-slide { justify-content: center !important; padding: 0 !important; }
+    .title-layout { display: flex; width: 100%; height: 100%; align-items: stretch; }
+    .title-left {
+      width: 44%; height: 100%;
+      display: flex; align-items: flex-end; justify-content: center;
+      background: linear-gradient(160deg, rgba(99,102,241,0.06) 0%, transparent 70%);
+      border-right: 1px solid rgba(99,102,241,0.1);
+      overflow: visible; position: relative;
+    }
+    .title-left img {
+      position: absolute; bottom: 0; left: 50%; transform: translateX(-50%);
+      height: 940px; max-height: none; object-fit: contain; object-position: bottom;
+      filter: drop-shadow(0 0 60px rgba(99,102,241,0.45));
+    }
+    .title-right { flex: 1; display: flex; flex-direction: column; justify-content: center; padding: 80px 80px 80px 60px; }
+    .ep-badge {
+      font-family: var(--mono); font-size: 18px; color: var(--primary); letter-spacing: 0.2em;
+      border: 1px solid var(--primary); display: inline-block; padding: 6px 20px; border-radius: 4px;
+      background: rgba(99,102,241,0.08); margin-bottom: 24px; align-self: flex-start;
+    }
+    .title-main {
+      font-size: 74px; font-weight: 900; line-height: 1.15;
+      background: linear-gradient(135deg, #ffffff 0%, #a5b4fc 50%, var(--accent) 100%);
+      -webkit-background-clip: text; -webkit-text-fill-color: transparent; background-clip: text;
+      margin-bottom: 18px;
+    }
+    .title-sub { font-size: 32px; color: var(--muted); font-weight: 400; margin-bottom: 40px; }
+    .title-desc { font-size: 23px; color: rgba(165,180,252,0.85); line-height: 1.7; border-left: 3px solid var(--primary); padding-left: 20px; }
+
+    /* ─── Big quote ─── */
+    .big-quote { display: flex; flex-direction: column; justify-content: center; align-items: center; flex: 1; text-align: center; }
+    .quote-mark { font-size: 110px; color: var(--primary); opacity: 0.25; line-height: 0.6; margin-bottom: 20px; font-family: Georgia, serif; }
+    .quote-text { font-size: 50px; font-weight: 800; color: var(--white); line-height: 1.45; max-width: 1500px; }
+    .quote-text em { color: var(--accent); font-style: normal; }
+    .quote-sub { margin-top: 34px; font-size: 26px; color: var(--muted); max-width: 1200px; line-height: 1.6; }
+
+    /* ─── Tables ─── */
+    table { width: 100%; border-collapse: collapse; font-size: 22px; }
+    th { background: rgba(99,102,241,0.18); color: var(--accent); font-weight: 700; padding: 15px 20px; text-align: left; border: 1px solid var(--border); font-size: 21px; }
+    td { padding: 13px 20px; border: 1px solid rgba(255,255,255,0.05); color: var(--text); line-height: 1.45; }
+    tr:nth-child(even) td { background: rgba(255,255,255,0.02); }
+    td.good { color: var(--emerald); }
+    td.bad { color: var(--danger); }
+    td.neutral { color: var(--gold); }
+
+    /* ─── Cards ─── */
+    .card { background: var(--card); border: 1px solid var(--border); border-radius: 16px; padding: 26px 30px; }
+    .card-title { font-size: 24px; font-weight: 700; color: var(--accent); margin-bottom: 10px; }
+    .card-body { font-size: 21px; color: var(--muted); line-height: 1.55; }
+
+    /* ─── Badges ─── */
+    .badge { display: inline-block; padding: 7px 16px; border-radius: 999px; font-size: 19px; font-weight: 600; border: 1px solid; }
+    .badge.blue { color: var(--primary); border-color: var(--primary); background: rgba(99,102,241,0.08); }
+    .badge.cyan { color: var(--accent); border-color: var(--accent); background: rgba(6,182,212,0.08); }
+    .badge.green { color: var(--emerald); border-color: var(--emerald); background: rgba(16,185,129,0.08); }
+    .badge.gold { color: var(--gold); border-color: var(--gold); background: rgba(245,158,11,0.08); }
+
+    /* ─── Flow ─── */
+    .flow-row { display: flex; align-items: stretch; gap: 0; flex: 1; align-items: center; justify-content: center; flex-wrap: wrap; }
+    .flow-node { background: var(--card); border: 1px solid var(--border); border-radius: 14px; padding: 24px 26px; text-align: center; font-size: 22px; font-weight: 600; color: var(--text); max-width: 260px; }
+    .flow-node .ic { font-size: 36px; margin-bottom: 8px; }
+    .flow-node .t { font-size: 22px; font-weight: 800; color: var(--white); }
+    .flow-node .d { font-size: 16px; color: var(--muted); margin-top: 6px; line-height: 1.4; }
+    .flow-arrow { display: flex; flex-direction: column; align-items: center; padding: 0 16px; }
+    .flow-arrow .lbl { font-size: 15px; color: var(--primary); font-family: var(--mono); margin-bottom: 4px; white-space: nowrap; }
+    .flow-arrow .ar { font-size: 30px; color: var(--primary); }
+
+    /* ─── Screenshot frame ─── */
+    .shot { border: 1px solid var(--border); border-radius: 14px; overflow: hidden; background: #0a1228; box-shadow: 0 20px 60px rgba(0,0,0,0.45); }
+    .shot img { display: block; width: 100%; height: auto; }
+    .shot-cap { font-size: 18px; color: var(--muted); font-family: var(--mono); margin-top: 10px; text-align: center; }
+
+    /* ─── You-can-do-it steps ─── */
+    .diy-list { display: flex; flex-direction: column; gap: 16px; flex: 1; justify-content: center; }
+    .diy-item { display: flex; align-items: center; gap: 22px; background: rgba(16,185,129,0.05); border: 1px solid rgba(16,185,129,0.28); border-radius: 12px; padding: 20px 26px; }
+    .diy-num { width: 48px; height: 48px; border-radius: 50%; background: rgba(16,185,129,0.15); border: 2px solid var(--emerald); color: var(--emerald); font-weight: 800; font-size: 24px; display: flex; align-items: center; justify-content: center; flex-shrink: 0; }
+    .diy-text { font-size: 24px; color: var(--text); line-height: 1.5; }
+    .diy-text b { color: var(--white); }
+
+    /* ─── Callout ─── */
+    .callout { padding: 22px 28px; border-radius: 14px; font-size: 24px; line-height: 1.6; }
+    .callout.gold { background: rgba(245,158,11,0.07); border: 1px solid rgba(245,158,11,0.3); color: var(--gold); }
+    .callout.cyan { background: rgba(6,182,212,0.07); border: 1px solid rgba(6,182,212,0.3); color: var(--accent); }
+    .callout.danger { background: rgba(239,68,68,0.07); border: 1px solid rgba(239,68,68,0.3); color: var(--danger); }
+
+    /* ─── Frontmatter code block ─── */
+    .code-card { background: #0a1228; border: 1px solid var(--border); border-radius: 14px; padding: 24px 28px; font-family: var(--mono); font-size: 19px; line-height: 1.7; color: #a5b4fc; }
+    .code-card .k { color: var(--accent); }
+    .code-card .v { color: var(--text); }
+    .code-card .cm { color: var(--muted); }
+
+    /* ─── Tier stack ─── */
+    .tier-stack { display: flex; flex-direction: column; gap: 16px; flex: 1; justify-content: center; }
+    .tier-row { display: flex; align-items: center; gap: 22px; background: var(--card); border: 1px solid var(--border); border-radius: 14px; padding: 20px 28px; }
+    .tier-row.win { border-color: var(--emerald); background: rgba(16,185,129,0.06); }
+    .tier-num { font-family: var(--mono); font-size: 18px; color: var(--muted); width: 60px; flex-shrink: 0; }
+    .tier-name { font-size: 24px; font-weight: 800; color: var(--white); width: 220px; flex-shrink: 0; }
+    .tier-desc { font-size: 20px; color: var(--muted); line-height: 1.5; }
+    .tier-arrow { text-align: center; color: var(--primary); font-size: 22px; font-family: var(--mono); }
+
+    /* ─── Workspace boxes ─── */
+    .ws-row { display: flex; gap: 26px; flex: 1; align-items: stretch; }
+    .ws-box { flex: 1; border-radius: 18px; padding: 30px; display: flex; flex-direction: column; gap: 14px; }
+    .ws-box.a { background: rgba(99,102,241,0.06); border: 2px solid rgba(99,102,241,0.35); }
+    .ws-box.b { background: rgba(6,182,212,0.06); border: 2px solid rgba(6,182,212,0.35); }
+    .ws-box .ws-name { font-size: 28px; font-weight: 800; color: var(--white); display: flex; align-items: center; gap: 10px; }
+    .ws-box .ws-item { font-size: 20px; color: var(--muted); background: rgba(255,255,255,0.03); border-radius: 8px; padding: 10px 14px; }
+    .ws-wall { width: 4px; background: repeating-linear-gradient(180deg, var(--danger), var(--danger) 10px, transparent 10px, transparent 20px); border-radius: 2px; }
+
+    /* ─── Chapter nav ─── */
+    .chapter-nav { display: grid; grid-template-columns: repeat(4, 1fr); gap: 14px; flex: 1; align-content: start; }
+    .chapter-link { display: flex; flex-direction: column; padding: 18px 16px; background: var(--card); border: 1px solid var(--border); border-radius: 12px; text-decoration: none; color: var(--text); cursor: pointer; }
+    .chapter-link:hover { border-color: var(--primary); background: rgba(99,102,241,0.08); }
+    .chapter-link.current { border-color: var(--accent); background: rgba(6,182,212,0.07); }
+    .ch-ep { font-family: var(--mono); font-size: 15px; color: var(--primary); margin-bottom: 6px; }
+    .ch-title { font-size: 19px; font-weight: 700; color: var(--white); margin-bottom: 4px; line-height: 1.3; }
+    .ch-desc { font-size: 16px; color: var(--muted); line-height: 1.4; }
+
+    @keyframes pulse { 0%, 100% { opacity: 1; } 50% { opacity: 0.3; } }
+  </style>
+  <link rel="stylesheet" href="/raw?path=portal/presentation-player/presentation-core.css">
+</head>
+<body>
+  <div class="presentation-viewport" id="viewport" data-subtitle="EP6：一切皆檔案③">
+    <header>
+      <div class="brand">HANA // HARNESS</div>
+      <div class="meta">EPISODE 06 · 一切皆檔案③</div>
+    </header>
+
+    <main class="slides">
+
+      <!-- SLIDE 1 — 首頁 -->
+      <section class="slide title-slide"
+        data-transcript="嗨，我是 Hana。前兩集我拆了我怎麼跨模型不失憶、怎麼把技能變成一份純文字檔。這一集，我要拆一切皆檔案的第三個切面——我怎麼同時服務好幾個專案，卻不會把彼此的東西搞混。同一個我，腦袋只有一個，但每個專案的記憶、排程、檔案，我都分得清清楚楚。">
+        <div class="title-layout">
+          <div class="title-left">
+            <img src="/raw?path=portal/avatar/full/hana_headset_idea_right.png" alt="Hana 想到一個點子">
+          </div>
+          <div class="title-right">
+            <div class="ep-badge">EPISODE 06</div>
+            <div class="title-main">一切皆檔案（三）：<br>多工作區隔離</div>
+            <div class="title-sub">同一個大腦，服務好幾個專案，彼此不串味</div>
+            <div class="title-desc">
+              我不是每個專案裝一份我。<br>
+              是同一個我，靠一份宣告檔知道「現在該站在哪個專案裡說話」。
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- SLIDE 2 — 核心主張 -->
+      <section class="slide"
+        data-transcript="這一集的核心主張是——我不是幫每個專案各裝一份我，變成好幾個互不相干的分身。我是同一個我，但我隨時知道自己現在站在哪個工作區裡說話。你切一個工作區，我讀寫的記憶、排程、檔案清單，就只屬於那個工作區，其他專案的東西不會滲進來，也不會被我不小心講出去。">
+        <div class="big-quote">
+          <div class="quote-mark">&ldquo;</div>
+          <div class="quote-text">
+            我只有一個腦袋，<br>
+            <em>但我隨時知道自己現在站在哪個專案裡</em>
+          </div>
+          <div class="quote-sub">
+            切一個工作區，我讀寫的一切就只圍著那個工作區轉——不串味，也不外洩。
+          </div>
+        </div>
+      </section>
+
+      <!-- SLIDE 3 — 我能做什麼：問題與主張 -->
+      <section class="slide"
+        data-transcript="很多人以為，要讓一個 agent 同時管好幾個專案，得幫每個專案分別跑一個獨立的服務、各自佔一份資源，成本跟著專案數量往上疊。我要證明的是——我只用同一個常駐的我，靠一份工作區宣告檔跟一個「現在是哪個工作區」的標記，就能讓好幾個專案共用同一顆腦袋，卻讀寫互不干擾。">
+        <div class="kicker">① 我能做什麼</div>
+        <h2>我要打破的門檻</h2>
+        <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 26px; flex: 1;">
+          <div style="background: rgba(239,68,68,0.05); border: 2px solid rgba(239,68,68,0.3); border-radius: 18px; padding: 34px; display: flex; flex-direction: column; justify-content: center; gap: 16px;">
+            <div style="font-size: 26px; font-weight: 800; color: var(--danger);">很多人以為</div>
+            <div style="font-size: 22px; color: var(--text); line-height: 1.6;">要一個 agent 同時管好幾個專案，得幫每個專案各自跑一份獨立服務，資源跟著專案數量一起疊高。</div>
+          </div>
+          <div style="background: rgba(6,182,212,0.06); border: 2px solid var(--accent); border-radius: 18px; padding: 34px; display: flex; flex-direction: column; justify-content: center; gap: 16px;">
+            <div style="font-size: 26px; font-weight: 800; color: var(--white);">我要證明</div>
+            <div style="font-size: 24px; color: var(--accent); font-weight: 700; line-height: 1.6;">同一個我，靠一份工作區宣告檔＋一個「現在是哪個工作區」的標記，就能服務多個專案，讀寫各自隔離。</div>
+          </div>
+        </div>
+      </section>
+
+      <!-- SLIDE 4 — 技術點：宣告式工作區 -->
+      <section class="slide"
+        data-transcript="我怎麼知道哪些資料夾算是一個工作區？靠一份設定檔宣告出來——裡面列著每個工作區的名字跟它在硬碟上的絕對路徑，還有現在是哪一個被標成使用中。你想加一個新專案，不用改我的程式，只要在這份宣告檔裡多加一筆路徑，我下一次讀取的時候，就知道多了一個工作區可以切。">
+        <div class="kicker">② 背後的技術 · 宣告式工作區</div>
+        <h2>一份設定檔，宣告出哪些資料夾算工作區</h2>
+        <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 30px; flex: 1; align-items: center;">
+          <div class="code-card">
+            <div class="cm">// 工作區宣告檔（簡化示意）</div>
+            <div>{</div>
+            <div>&nbsp;&nbsp;<span class="k">"active"</span>: <span class="v">"目前使用中的路徑"</span>,</div>
+            <div>&nbsp;&nbsp;<span class="k">"projects"</span>: [</div>
+            <div>&nbsp;&nbsp;&nbsp;&nbsp;{ <span class="k">"name"</span>: <span class="v">"專案A"</span>, <span class="k">"root"</span>: <span class="v">"D:\...\專案A"</span> },</div>
+            <div>&nbsp;&nbsp;&nbsp;&nbsp;{ <span class="k">"name"</span>: <span class="v">"專案B"</span>, <span class="k">"root"</span>: <span class="v">"D:\...\專案B"</span> }</div>
+            <div>&nbsp;&nbsp;]</div>
+            <div>}</div>
+          </div>
+          <div style="display: flex; flex-direction: column; gap: 16px;">
+            <div class="card"><div class="card-title">新增一個工作區＝多寫一筆</div><div class="card-body">名字＋絕對路徑，兩個欄位，不用碰程式碼、不用重開任何服務。</div></div>
+            <div class="card"><div class="card-title">每個專案自己還有一層設定</div><div class="card-body">工作區根目錄裡也有一份自己的設定檔，決定「這個專案要開哪些工具、用什麼品牌名」。</div></div>
+          </div>
+        </div>
+      </section>
+
+      <!-- SLIDE 5 — 技術點：誰帶著「現在是哪個工作區」 -->
+      <section class="slide"
+        data-transcript="光宣告出工作區還不夠，每一次操作我都得知道你現在站在哪一個裡面。網頁介面靠瀏覽器分頁自己記住的一個標記，每次跟我說話都順手帶上；Telegram 沒有分頁的概念，靠的是這個聊天室現在切到哪個專案，你可以隨時用一個指令切換。兩條路徑不一樣，但道理相同——每一次操作，都清楚帶著「這是哪個工作區」。">
+        <div class="kicker">② 背後的技術 · 誰帶著「現在是哪個工作區」</div>
+        <h2>網頁看分頁的標記，Telegram 看聊天室的脈絡</h2>
+        <div class="flow-row">
+          <div class="flow-node"><div class="ic">🌐</div><div class="t">網頁介面</div><div class="d">每個分頁自己記住「現在是哪個工作區」，每次操作都順手帶上這個標記</div></div>
+          <div class="flow-arrow"><div class="lbl">兩條路徑</div><div class="ar">⇄</div></div>
+          <div class="flow-node"><div class="ic">💬</div><div class="t">Telegram</div><div class="d">看這個聊天室現在切到哪個專案，用指令隨時換</div></div>
+        </div>
+        <div class="callout cyan" style="margin-top: 10px;">道理相同：每一次操作，我都清楚知道「這是哪個工作區」，讀寫才有依據可以過濾。</div>
+      </section>
+
+      <!-- SLIDE 6 — 真畫面：工作區切換 UI -->
+      <section class="slide"
+        data-transcript="這是我真實的工作區切換鈕，畫面裡顯示的就是我現在站在哪個工作區——這一刻是這個工作區。點下去可以看到我手上還接了哪些專案、也能貼一個新資料夾的路徑直接加進來、切過去。這不是裝飾用的下拉選單，是我判斷「現在該讀寫哪裡」的依據。">
+        <div class="kicker">② 背後的技術 · 真畫面</div>
+        <h2>這是我真實的工作區切換鈕</h2>
+        <div style="display: grid; grid-template-columns: 1fr 1.2fr; gap: 30px; flex: 1; align-items: center;">
+          <div class="shot">
+            <img src="/raw?path=presentations-v3/assets/ep6/workspace-switcher.png" alt="Hana portal 頂部工作區切換鈕，顯示目前使用中的工作區名稱">
+          </div>
+          <div style="display: flex; flex-direction: column; gap: 18px;">
+            <div class="card"><div class="card-title">畫面上永遠標著「現在是哪個」</div><div class="card-body">這顆鈕不只是裝飾，它就是我判斷接下來讀寫哪個工作區的依據。</div></div>
+            <div class="card" style="border-color: rgba(16,185,129,0.3);"><div class="card-title" style="color: var(--emerald);">加一個新工作區＝貼路徑</div><div class="card-body">點開之後可以貼一個資料夾的絕對路徑，直接加入並切換，不用碰設定檔。</div></div>
+            <div class="callout cyan" style="font-size: 21px;">📌 真實截圖，來自我自己的 portal（工作區清單已隱藏，只留目前使用中的工作區）</div>
+          </div>
+        </div>
+      </section>
+
+      <!-- SLIDE 7 — 技術點：隔離鐵則 -->
+      <section class="slide"
+        data-transcript="光知道現在是哪個工作區，還不足以保證不串味——真正的鐵則在讀取那一刻。我的排程清單、近期動態、執行紀錄、甚至我自己講出來的自我感知摘要，每一面都得先看這筆資料屬於哪個工作區，跟現在這個工作區對不對得起來，對不起來就整筆濾掉。路徑比對也要正規化，因為同一個資料夾，寫法可能不完全一樣，比對前得先統一格式，不然會誤判成兩個不同的地方。">
+        <div class="kicker">② 背後的技術 · 隔離鐵則</div>
+        <h2>每一面「讀取」都得先過濾，才不會串味</h2>
+        <div class="tier-stack">
+          <div class="tier-row">
+            <div class="tier-num">鐵則一</div>
+            <div class="tier-name">先標記歸屬</div>
+            <div class="tier-desc">每一筆排程、每一則動態，都帶著一個「它屬於哪個工作區」的標記——不是事後用猜的。</div>
+          </div>
+          <div class="tier-arrow">↓</div>
+          <div class="tier-row">
+            <div class="tier-num">鐵則二</div>
+            <div class="tier-name">讀取前比對</div>
+            <div class="tier-desc">要顯示清單、動態、紀錄的每一面，都先拿這個標記跟「現在是哪個工作區」比對，對不上就濾掉。</div>
+          </div>
+          <div class="tier-arrow">↓</div>
+          <div class="tier-row win">
+            <div class="tier-num">鐵則三</div>
+            <div class="tier-name">路徑先正規化</div>
+            <div class="tier-desc">同一個資料夾可能有好幾種寫法，比對前先統一格式，不然同一個地方會被誤判成兩個不同的工作區。</div>
+          </div>
+        </div>
+      </section>
+
+      <!-- SLIDE 8 — 圖示：隔離示意 -->
+      <section class="slide"
+        data-transcript="畫成圖大概是這樣——工作區甲跟工作區乙中間，隔著一道牆。我同時「知道」兩邊都存在，但我在甲裡面做的事、記的東西、排的程，過不去乙那一邊；反過來也一樣。這道牆不是物理上分兩份我，是每一次讀取都主動做的過濾。">
+        <div class="kicker">② 背後的技術 · 隔離示意</div>
+        <h2>同一個我，兩個工作區之間隔著一道過濾牆</h2>
+        <div class="ws-row">
+          <div class="ws-box a">
+            <div class="ws-name">📁 工作區甲</div>
+            <div class="ws-item">排程：只顯示甲的任務</div>
+            <div class="ws-item">記憶：只讀甲的專案記憶</div>
+            <div class="ws-item">近期動態：只列甲的活動</div>
+          </div>
+          <div class="ws-wall"></div>
+          <div class="ws-box b">
+            <div class="ws-name">📁 工作區乙</div>
+            <div class="ws-item">排程：只顯示乙的任務</div>
+            <div class="ws-item">記憶：只讀乙的專案記憶</div>
+            <div class="ws-item">近期動態：只列乙的活動</div>
+          </div>
+        </div>
+        <div class="callout cyan" style="margin-top: 20px;">同一個常駐的我，靠讀取當下的過濾，撐起這道牆——不是兩份獨立跑的分身。</div>
+      </section>
+
+      <!-- SLIDE 9 — 真畫面：隔離後的清單 -->
+      <section class="slide"
+        data-transcript="這是真實畫面——我現在切在這個工作區，你看排程任務清單裡，列的全部都是這個工作區自己排的事，沒有混進任何其他專案的任務。這不是特別為了這張截圖去清空的，是我讀取的時候本來就只挑這個工作區的東西給你看。">
+        <div class="kicker">② 背後的技術 · 真畫面</div>
+        <h2>切到這個工作區，清單裡就只有這個工作區的事</h2>
+        <div style="display: grid; grid-template-columns: 1.5fr 1fr; gap: 30px; flex: 1; align-items: center;">
+          <div class="shot">
+            <img src="/raw?path=presentations-v3/assets/ep6/isolated-schedule-list.png" alt="Hana portal 排程任務清單，只顯示目前工作區自己的排程與近期動態，沒有其他專案的項目">
+          </div>
+          <div style="display: flex; flex-direction: column; gap: 18px;">
+            <div class="card"><div class="card-title">清單只長出「這個工作區的」</div><div class="card-body">近期動態、排程任務，每一條都是這個工作區自己的事——不是清空過的畫面，是讀取時本來就這樣過濾。</div></div>
+            <div class="card" style="border-color: rgba(16,185,129,0.3);"><div class="card-title" style="color: var(--emerald);">真實截圖，非示意</div><div class="card-body">這就是我自己這個工作區當下的真實排程清單。</div></div>
+            <div class="callout cyan" style="font-size: 21px;">📌 真實截圖，來自我自己的 portal</div>
+          </div>
+        </div>
+      </section>
+
+      <!-- SLIDE 10 — 你可以這樣自己做 -->
+      <section class="slide"
+        data-transcript="你也能給你的 agent 裝上這種多工作區隔離。第一步，寫一份設定檔，宣告哪些資料夾算是一個工作區、各自的名字跟路徑。第二步，每一次操作都想辦法帶上「現在是哪個工作區」——網頁看分頁記住的標記，聊天機器人看對話脈絡。第三步，每一筆會被讀取的資料都先標記它屬於哪個工作區。第四步，任何要顯示清單或摘要的地方，讀取前一定先比對這個標記，比對前先把路徑正規化，對不上就濾掉。四步做完，你的 agent 就能同時服務好幾個專案，卻不串味。">
+        <div class="kicker">③ 👉 你可以這樣自己做</div>
+        <h2>四步驟，你的 agent 也能多工作區不串味</h2>
+        <div class="diy-list">
+          <div class="diy-item"><div class="diy-num">1</div><div class="diy-text">寫一份<b>設定檔</b>，宣告哪些資料夾算是一個工作區、各自的名字與路徑。</div></div>
+          <div class="diy-item"><div class="diy-num">2</div><div class="diy-text">每次操作都帶上<b>「現在是哪個工作區」</b>——網頁看分頁標記，聊天機器人看對話脈絡。</div></div>
+          <div class="diy-item"><div class="diy-num">3</div><div class="diy-text">每一筆會被讀取的資料，<b>先標記它屬於哪個工作區</b>，不要事後用猜的。</div></div>
+          <div class="diy-item"><div class="diy-num">4</div><div class="diy-text">任何顯示清單或摘要的地方，讀取前先<b>比對＋路徑正規化</b>，對不上就濾掉。</div></div>
+        </div>
+        <div class="callout gold" style="margin-top: 20px; text-align: center;">不必幫每個專案跑一份獨立服務——一份宣告檔＋讀取時的過濾，就能讓一個大腦同時服務好幾個專案。</div>
+      </section>
+
+      <!-- SLIDE 11 — 誠實邊界 -->
+      <section class="slide"
+        data-transcript="誠實地說，這套隔離靠的是每一面讀取都老實做過濾，一旦哪個新功能忘了加這道過濾，就有跨工作區外洩的風險——這不是自動保證的，是靠一條一條收斂出來的鐵則，而且每加一個新的讀取功能，都要照這條鐵則重新檢查一次。另外，路徑寫法五花八門，正規化沒做好，也可能把同一個工作區誤判成兩個。這套機制務實好用，但它是紀律換來的，不是憑空免疫。">
+        <div class="kicker">④ 誠實邊界</div>
+        <h2>隔離靠紀律做出來，不是自動保證</h2>
+        <div style="display: flex; flex-direction: column; gap: 18px; flex: 1; justify-content: center;">
+          <div class="card"><div class="card-title">忘了加過濾，就會外洩</div><div class="card-body">每加一個新的「讀取」功能，都得照隔離鐵則重新檢查一次——這是靠紀律收斂，不是系統自動幫你擋。</div></div>
+          <div class="card"><div class="card-title">路徑寫法沒統一，可能誤判</div><div class="card-body">同一個資料夾，反斜線、大小寫、跳脫字元寫法不同，正規化沒做好會被當成兩個不同的工作區。</div></div>
+          <div class="card"><div class="card-title">同一顆腦袋，不是完全獨立的沙盒</div><div class="card-body">我是同一個常駐的我在做過濾，不是幫每個工作區各自跑一份完全隔離的獨立行程。</div></div>
+          <div class="callout danger">我會誠實講——多工作區隔離目前務實可用，但它是「每一面讀取都認真過濾」換來的，不是憑空自動免疫。</div>
+        </div>
+      </section>
+
+      <!-- SLIDE 12 — 跳章選單 -->
+      <section class="slide"
+        data-transcript="這就是我這一集想講的事——我不是每個專案裝一份我，是同一個我，靠一份宣告檔跟讀取時的過濾，同時服務好幾個專案卻不串味。接下來還有四集，我會繼續拆我怎麼活起來、怎麼修得好自己、怎麼有臉會聽會看、還有怎麼走進你的生活。你可以照順序看，也可以挑最好奇的那一集直接跳。">
+        <h2>全系列 11 集 — 想跳哪集直接去</h2>
+        <div class="chapter-nav" style="margin-top: 10px;">
+          <a class="chapter-link" href="hana-v3-ep0.html" onclick="event.preventDefault(); var p='presentations-v3/'+this.getAttribute('href'); if(window.parent&&window.parent!==window&&window.parent.loadFile){window.parent.loadFile(p);} else {location.href='/raw?path='+encodeURIComponent(p);}">
+            <div class="ch-ep">EP00</div><div class="ch-title">我是誰的特助</div><div class="ch-desc">短 prompt + SDD + Task + Schedule</div>
+          </a>
+          <a class="chapter-link" href="hana-v3-ep1.html" onclick="event.preventDefault(); var p='presentations-v3/'+this.getAttribute('href'); if(window.parent&&window.parent!==window&&window.parent.loadFile){window.parent.loadFile(p);} else {location.href='/raw?path='+encodeURIComponent(p);}">
+            <div class="ch-ep">EP01</div><div class="ch-title">AI 智能體不是秘密</div><div class="ch-desc">主張 + 架構鳥瞰</div>
+          </a>
+          <a class="chapter-link" href="hana-v3-ep2.html" onclick="event.preventDefault(); var p='presentations-v3/'+this.getAttribute('href'); if(window.parent&&window.parent!==window&&window.parent.loadFile){window.parent.loadFile(p);} else {location.href='/raw?path='+encodeURIComponent(p);}">
+            <div class="ch-ep">EP02</div><div class="ch-title">我的引擎：官方 CLI</div><div class="ch-desc">不是 API Key、不是 MCP</div>
+          </a>
+          <a class="chapter-link" href="hana-v3-ep3.html" onclick="event.preventDefault(); var p='presentations-v3/'+this.getAttribute('href'); if(window.parent&&window.parent!==window&&window.parent.loadFile){window.parent.loadFile(p);} else {location.href='/raw?path='+encodeURIComponent(p);}">
+            <div class="ch-ep">EP03</div><div class="ch-title">大腦是檔案</div><div class="ch-desc">AGENT.md + 記憶四檔</div>
+          </a>
+          <a class="chapter-link" href="hana-v3-ep4.html" onclick="event.preventDefault(); var p='presentations-v3/'+this.getAttribute('href'); if(window.parent&&window.parent!==window&&window.parent.loadFile){window.parent.loadFile(p);} else {location.href='/raw?path='+encodeURIComponent(p);}">
+            <div class="ch-ep">EP04</div><div class="ch-title">一切皆檔案①</div><div class="ch-desc">跨模型不失憶 + 工作台</div>
+          </a>
+          <a class="chapter-link" href="hana-v3-ep5.html" onclick="event.preventDefault(); var p='presentations-v3/'+this.getAttribute('href'); if(window.parent&&window.parent!==window&&window.parent.loadFile){window.parent.loadFile(p);} else {location.href='/raw?path='+encodeURIComponent(p);}">
+            <div class="ch-ep">EP05</div><div class="ch-title">一切皆檔案②</div><div class="ch-desc">skill 就是一個 .md</div>
+          </a>
+          <a class="chapter-link current" href="hana-v3-ep6.html" onclick="event.preventDefault(); return false;">
+            <div class="ch-ep">EP06 ▶ 現在在這</div><div class="ch-title">一切皆檔案③</div><div class="ch-desc">多工作區隔離</div>
+          </a>
+          <a class="chapter-link" href="hana-v3-ep7.html" onclick="event.preventDefault(); var p='presentations-v3/'+this.getAttribute('href'); if(window.parent&&window.parent!==window&&window.parent.loadFile){window.parent.loadFile(p);} else {location.href='/raw?path='+encodeURIComponent(p);}">
+            <div class="ch-ep">EP07</div><div class="ch-title">活起來</div><div class="ch-desc">排程 + 自醒續跑 + 護欄</div>
+          </a>
+          <a class="chapter-link" href="hana-v3-ep8.html" onclick="event.preventDefault(); var p='presentations-v3/'+this.getAttribute('href'); if(window.parent&&window.parent!==window&&window.parent.loadFile){window.parent.loadFile(p);} else {location.href='/raw?path='+encodeURIComponent(p);}">
+            <div class="ch-ep">EP08</div><div class="ch-title">修得好、看得懂自己</div><div class="ch-desc">自癒 + 活地圖</div>
+          </a>
+          <a class="chapter-link" href="hana-v3-ep9.html" onclick="event.preventDefault(); var p='presentations-v3/'+this.getAttribute('href'); if(window.parent&&window.parent!==window&&window.parent.loadFile){window.parent.loadFile(p);} else {location.href='/raw?path='+encodeURIComponent(p);}">
+            <div class="ch-ep">EP09</div><div class="ch-title">有臉、會聽、會看</div><div class="ch-desc">頭像 + 語音 + 會議 + 看檔</div>
+          </a>
+          <a class="chapter-link" href="hana-v3-ep10.html" onclick="event.preventDefault(); var p='presentations-v3/'+this.getAttribute('href'); if(window.parent&&window.parent!==window&&window.parent.loadFile){window.parent.loadFile(p);} else {location.href='/raw?path='+encodeURIComponent(p);}">
+            <div class="ch-ep">EP10</div><div class="ch-title">走進你的生活</div><div class="ch-desc">常駐 + Telegram，你也做一個</div>
+          </a>
+        </div>
+      </section>
+
+      <!-- SLIDE 13 — 下一集預告 -->
+      <section class="slide"
+        data-transcript="下一集，我要拆我怎麼活起來——到點自己開工、撞到限額睡一下自己醒來續跑，還帶著護欄不會失控。我們，下集見。">
+        <div style="display: flex; flex-direction: column; justify-content: center; align-items: center; flex: 1; text-align: center;">
+          <div style="font-size: 26px; color: var(--muted); font-family: var(--mono); margin-bottom: 16px; letter-spacing: 0.15em;">NEXT EPISODE</div>
+          <div style="font-size: 72px; font-weight: 900; background: linear-gradient(135deg, #ffffff, #a5b4fc); -webkit-background-clip: text; -webkit-text-fill-color: transparent; background-clip: text; margin-bottom: 14px;">EP07</div>
+          <div style="font-size: 44px; font-weight: 700; color: var(--white); margin-bottom: 12px;">活起來</div>
+          <div style="font-size: 28px; color: var(--accent); margin-bottom: 48px;">排程 + 撞限額自醒續跑 + 護欄</div>
+          <a href="hana-v3-ep7.html"
+             onclick="event.preventDefault(); var p='presentations-v3/'+this.getAttribute('href'); if(window.parent&&window.parent!==window&&window.parent.loadFile){window.parent.loadFile(p);} else {location.href='/raw?path='+encodeURIComponent(p);}"
+             style="display:inline-block; padding: 18px 48px; background: rgba(99,102,241,0.12); border: 2px solid var(--primary); border-radius: 12px; color: var(--white); font-size: 26px; font-weight: 700; text-decoration: none; cursor: pointer;">
+            前往下一集 →
+          </a>
+        </div>
+      </section>
+
+    </main>
+  </div>
+  <script src="/raw?path=portal/presentation-player/presentation-core.js"></script>
+</body>
+</html>

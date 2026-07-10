@@ -1,0 +1,109 @@
+/* presentation-core.css — 共享簡報外殼 + 設計系統
+ * 來源：以 ep2 (presentation-hana-episode2.html) 的 proven 樣式為基準抽出。
+ * 配對：presentation-core.js（播放引擎）、hana-overlay.js（浮動頭像 + 語音，由 server 注入）。
+ * 規格：specs/SPEC-presentation-core.md
+ *
+ * Deck 只需提供：#viewport > header + main.slides（.slide[data-transcript]）。
+ * 其餘外殼（progress / timer / footer / tech-panel / drawer / overlay）由 core.js 建立。
+ */
+:root{--bg:#020617;--panel:rgba(15,23,42,.82);--line:rgba(148,163,184,.2);--text:#e5edf8;--muted:#9fb0c6;--cyan:#22d3ee;--blue:#60a5fa;--green:#34d399;--amber:#f59e0b;--danger:#fb7185;--font:'Inter','Noto Sans TC',sans-serif;--mono:'Fira Code',monospace}
+*{box-sizing:border-box;margin:0;padding:0}
+body{min-height:100vh;overflow:hidden;background:#01040d;color:var(--text);font-family:var(--font);display:flex;align-items:center;justify-content:center}
+.presentation-viewport{position:relative;width:1920px;height:1080px;overflow:hidden;display:flex;flex-direction:column;background:radial-gradient(circle at 20% 15%,rgba(34,211,238,.16),transparent 32%),radial-gradient(circle at 85% 80%,rgba(52,211,153,.12),transparent 34%),linear-gradient(135deg,#020617,#07111f 55%,#020617);transform-origin:center center;padding:40px 90px;box-shadow:0 0 80px rgba(0,0,0,.85)}
+.grid{position:absolute;inset:0;opacity:.14;background-image:linear-gradient(rgba(148,163,184,.28) 1px,transparent 1px),linear-gradient(90deg,rgba(148,163,184,.28) 1px,transparent 1px);background-size:72px 72px;mask-image:radial-gradient(circle at 50% 50%,black,transparent 78%)}
+.progress-wrap{position:absolute;top:0;left:0;width:100%;height:7px;background:rgba(255,255,255,.04);z-index:20}
+.progress{height:100%;width:0;background:linear-gradient(90deg,var(--blue),var(--cyan),var(--green));box-shadow:0 0 20px rgba(34,211,238,.5)}
+.timer{position:absolute;top:7px;left:0;height:3px;width:0;background:var(--amber);opacity:0;z-index:20}
+.timer.active{opacity:.9}
+header,footer{position:relative;z-index:4;display:flex;align-items:center;justify-content:space-between}
+header{height:74px;border-bottom:1px solid rgba(148,163,184,.14);padding-bottom:18px}
+footer{height:80px;border-top:1px solid rgba(148,163,184,.14);padding-top:20px}
+.brand{font-weight:900;letter-spacing:.08em;font-size:34px;background:linear-gradient(135deg,#bfdbfe,#67e8f9,#86efac);-webkit-background-clip:text;color:transparent}
+.meta{font-family:var(--mono);font-size:18px;color:var(--muted);border:1px solid var(--line);padding:9px 18px;border-radius:8px;background:rgba(15,23,42,.5)}
+.slides{position:relative;z-index:3;flex:1;min-height:0;perspective:1400px}
+.slide{position:absolute;inset:20px 0 24px 0;padding:40px 76px;border:1px solid var(--line);border-radius:8px;background:linear-gradient(145deg,rgba(15,23,42,.88),rgba(2,6,23,.72));box-shadow:0 40px 90px rgba(0,0,0,.45),inset 0 1px 0 rgba(255,255,255,.05);display:flex;flex-direction:column;justify-content:center;opacity:0;visibility:hidden;transform:rotateX(7deg) translateY(42px) scale(.96);transition:all .62s cubic-bezier(.16,1,.3,1)}
+/* PRES-MEDIA: 滿版圖版型 — 截圖/人像頁拿掉舒適內距，讓圖近乎貼齊 slide 邊框。
+ * 文字頁維持原本留白；只有 .slide.media 套用。!important 是為了蓋過各 deck 對 .slide 的 !important padding。*/
+.slide.media{inset:14px 0 18px 0!important;padding:20px 30px!important;gap:12px}
+.slide.media>h2,.slide.media>.media-title{flex:0 0 auto;margin-bottom:10px!important;padding-bottom:12px!important;font-size:38px!important}
+.slide.active{opacity:1;visibility:visible;transform:rotateX(0) translateY(0) scale(1);z-index:3}
+.slide.previous-slide{transform:rotateX(-7deg) translateY(-42px) scale(.96)}
+.kicker{font-family:var(--mono);font-size:20px;letter-spacing:.14em;color:var(--cyan);margin-bottom:22px;text-transform:uppercase}
+.slide h1{font-size:64px;line-height:1.15;font-weight:900;letter-spacing:0;margin-bottom:38px;max-width:1450px;background:linear-gradient(135deg,#fff,#c7d2fe 52%,#67e8f9);-webkit-background-clip:text;color:transparent}
+.slide p{font-size:40px;line-height:1.55;color:var(--muted);max-width:1380px}
+.title-slide{text-align:center;align-items:center}
+.title-slide h1{font-size:92px}
+.title-slide p{font-size:40px}
+.compare-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:24px}
+.mini-card{min-height:230px;border:1px solid var(--line);border-radius:8px;background:rgba(2,6,23,.62);padding:28px}
+.mini-card h3{font-size:34px;margin-bottom:22px;color:#fff}
+.mini-card span{display:block;font-size:26px;color:var(--muted);line-height:1.65}
+.mini-card.danger{border-color:rgba(251,113,133,.42)}
+.conclusion{margin-top:26px;border-left:6px solid var(--cyan);padding:18px 24px;background:rgba(34,211,238,.08);font-size:30px;color:#dff9ff}
+.pipeline,.steps,.fileflow{display:grid;grid-template-columns:1fr 60px 1fr 60px 1fr 60px 1fr;align-items:center;gap:12px}
+.node,.steps div,.fileflow div,.team-row div,.summary-points div{border:1px solid var(--line);border-radius:8px;background:rgba(2,6,23,.72);padding:28px;text-align:center}
+.node strong,.team-row strong{display:block;font-size:32px;color:#fff}
+.node span,.team-row span,.fileflow small{display:block;margin-top:12px;font-size:24px;color:var(--muted);line-height:1.45}
+.arrow{font-size:44px;color:var(--cyan);text-align:center}
+table{width:100%;border-collapse:collapse;background:rgba(2,6,23,.62);border:1px solid var(--line);border-radius:8px;overflow:hidden}
+th,td{border-bottom:1px solid var(--line);padding:24px 28px;text-align:left;font-size:28px;line-height:1.35}
+th{color:#fff;background:rgba(34,211,238,.1);font-size:24px;font-family:var(--mono)}
+td:first-child{color:#fff;font-weight:800}
+.route-map{text-align:center}
+.selector{display:inline-block;font-family:var(--mono);font-size:40px;padding:28px 54px;border:1px solid rgba(34,211,238,.5);border-radius:8px;background:rgba(34,211,238,.1)}
+.route-lines,.brain-row{display:grid;grid-template-columns:repeat(3,1fr);gap:24px;margin-top:34px}
+.route-lines span,.brain-row b{font-size:28px;padding:24px;border:1px solid var(--line);border-radius:8px;background:rgba(2,6,23,.72)}
+.steps{grid-template-columns:repeat(4,1fr)}
+.steps em{display:block;font-style:normal;font-family:var(--mono);font-size:22px;color:var(--cyan);margin-bottom:14px}
+.steps span{font-size:30px}
+.summary-points,.team-row{display:grid;grid-template-columns:repeat(4,1fr);gap:24px}
+.summary-points div{font-size:36px;font-weight:900}
+.broken-map{display:grid;grid-template-columns:1fr 80px 1fr 80px 1fr;align-items:center;gap:16px}
+.broken-map div{padding:58px 20px;text-align:center;font-size:42px;font-weight:900;border:1px solid var(--line);border-radius:8px;background:rgba(2,6,23,.72)}
+.broken-map small{font-size:22px;color:var(--muted)}
+.broken-map i{height:6px;background:repeating-linear-gradient(90deg,var(--danger) 0 18px,transparent 18px 34px);transform:rotate(-8deg)}
+.owner-map{display:grid;grid-template-columns:1.2fr 1fr;gap:40px;align-items:center}
+.big-core{border:1px solid rgba(34,211,238,.5);background:rgba(34,211,238,.1);border-radius:8px;text-align:center;padding:90px 30px;font-size:62px;font-weight:900}
+.big-core small{display:block;font-size:26px;color:var(--muted);margin-top:16px}
+.satellites{display:grid;gap:22px}
+.satellites span{font-size:34px;padding:30px;border:1px solid var(--line);border-radius:8px;background:rgba(2,6,23,.72)}
+.fileflow{grid-template-columns:1fr 80px 1fr 80px 1fr}
+.fileflow div:not(:last-child)::after{content:"\2192";position:absolute}
+.split{display:grid;grid-template-columns:1fr 1fr;gap:34px}
+.split div{border:1px solid var(--line);border-radius:8px;background:rgba(2,6,23,.72);padding:34px}
+.split span{display:block;font-size:34px;line-height:1.65;color:var(--muted)}
+.split span:first-child{font-size:42px;color:#fff;font-weight:900}
+.team-row{grid-template-columns:repeat(3,1fr)}
+.controls{display:flex;align-items:center;gap:16px}
+.btn{width:56px;height:56px;border-radius:50%;border:1px solid var(--line);background:rgba(15,23,42,.72);color:var(--text);font-size:24px;cursor:pointer}
+.btn:hover{border-color:var(--cyan);color:#fff;box-shadow:0 0 18px rgba(34,211,238,.3)}
+.btn:disabled{opacity:.25;cursor:not-allowed}
+.slide-number{font-family:var(--mono);font-size:20px;color:var(--muted)}
+.dots{display:flex;gap:10px}
+.dot{width:12px;height:12px;border-radius:999px;background:rgba(148,163,184,.32);cursor:pointer}
+.dot.active{width:34px;background:var(--cyan);box-shadow:0 0 14px rgba(34,211,238,.55)}
+.tech-panel{position:absolute;top:106px;right:90px;z-index:10;width:300px;padding:16px 18px;border:1px solid var(--line);border-radius:8px;background:rgba(2,6,23,.86);backdrop-filter:blur(20px);display:flex;flex-direction:column;gap:12px}
+.tech-title{font-family:var(--mono);font-size:14px;color:var(--cyan);letter-spacing:.12em}
+.row{display:flex;align-items:center;justify-content:space-between;color:var(--muted);font-size:15px}
+.row select,.row input{width:150px;background:#020617;color:var(--text);border:1px solid var(--line);border-radius:6px;padding:4px}
+.action{border:0;border-radius:6px;background:#2563eb;color:white;padding:7px 10px;font-weight:800;cursor:pointer}
+.action.stop{background:#e11d48}
+.switch{position:relative;width:44px;height:22px}
+.switch input{opacity:0}
+.slider{position:absolute;inset:0;border-radius:999px;background:rgba(148,163,184,.26);cursor:pointer}
+.slider:before{content:"";position:absolute;width:16px;height:16px;left:3px;top:3px;border-radius:50%;background:#fff;transition:.2s}
+input:checked+.slider{background:var(--cyan)}
+input:checked+.slider:before{transform:translateX(22px)}
+.drawer{position:absolute;top:0;right:-430px;width:430px;height:100%;z-index:12;background:rgba(2,6,23,.96);border-left:1px solid var(--line);padding:110px 38px;transition:right .35s ease;box-shadow:-28px 0 70px rgba(0,0,0,.5)}
+.drawer.open{right:0}
+.drawer-toggle{position:absolute;left:-58px;top:110px;width:58px;height:58px;border:1px solid var(--line);border-right:0;border-radius:8px 0 0 8px;background:rgba(2,6,23,.94);color:var(--text);font-size:24px;cursor:pointer}
+.drawer h2{font-size:28px;margin-bottom:22px}
+.transcript{font-size:22px;line-height:1.75;color:#cbd5e1;overflow:auto;height:calc(100% - 64px)}
+.overlay{position:absolute;inset:0;z-index:30;background:rgba(2,6,23,.9);display:flex;align-items:center;justify-content:center;flex-direction:column;gap:22px}
+.overlay.hidden{display:none}
+.overlay button{font-size:28px;border:1px solid rgba(34,211,238,.45);background:rgba(8,47,73,.8);color:white;border-radius:8px;padding:18px 34px;cursor:pointer}
+.presentation-mode .tech-panel,.presentation-mode .drawer,.presentation-mode footer,.presentation-mode header{opacity:0;pointer-events:none}
+/* PRES-ANIM-01: animation hooks — data-anim / data-anim-step */
+[data-anim]{opacity:0;transform:translateY(16px);transition:opacity .4s ease,transform .4s ease}
+[data-anim].anim-visible{opacity:1;transform:translateY(0)}
+body.exporting [data-anim]{opacity:1!important;transform:none!important;transition:none!important}

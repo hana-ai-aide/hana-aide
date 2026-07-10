@@ -1,0 +1,400 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+  <meta charset="UTF-8">
+  <title>Hana v3 — EP10：走進你的生活</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Fira+Code:wght@400;500;700&family=Inter:wght@300;400;500;600;700;800;900&family=Noto+Sans+TC:wght@300;400;500;700;900&display=swap" rel="stylesheet">
+  <style>
+    /* Hana v3 — 開源版技術自介（極客藍 Cyan × 初生青 Indigo） */
+    :root {
+      --bg: #050815;
+      --card: rgba(10, 18, 40, 0.85);
+      --border: rgba(99, 102, 241, 0.18);
+      --primary: #6366f1;
+      --primary-glow: rgba(99, 102, 241, 0.35);
+      --accent: #06b6d4;
+      --gold: #f59e0b;
+      --emerald: #10b981;
+      --danger: #ef4444;
+      --text: #e2e8f0;
+      --muted: #94a3b8;
+      --white: #ffffff;
+      --mono: 'Fira Code', monospace;
+      --sans: 'Inter', 'Noto Sans TC', sans-serif;
+    }
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    body { background: var(--bg); font-family: var(--sans); overflow: hidden; }
+
+    .presentation-viewport {
+      background:
+        radial-gradient(ellipse at 15% 15%, rgba(99,102,241,0.12) 0%, transparent 50%),
+        radial-gradient(ellipse at 85% 85%, rgba(6,182,212,0.08) 0%, transparent 50%),
+        linear-gradient(180deg, #080d1c 0%, #020510 100%) !important;
+    }
+
+    header {
+      position: absolute; top: 0; left: 0; right: 0;
+      display: flex; justify-content: space-between; align-items: center;
+      padding: 22px 60px; z-index: 50;
+      font-family: var(--mono); color: var(--muted); font-size: 17px;
+      border-bottom: 1px solid rgba(255,255,255,0.04);
+    }
+    .brand { color: var(--accent); font-weight: 700; letter-spacing: 0.1em; }
+
+    /* ─── Slide base ─── */
+    .slide {
+      display: flex !important; flex-direction: column !important;
+      justify-content: flex-start !important;
+      padding: 92px 92px 56px !important;
+      background: linear-gradient(145deg, rgba(10,18,40,0.92), rgba(4,8,20,0.96)) !important;
+      border-color: rgba(99,102,241,0.12) !important;
+      color: var(--text) !important; font-family: var(--sans) !important;
+    }
+    .slide h2 {
+      font-size: 48px; font-weight: 800; color: var(--white);
+      margin-bottom: 26px; padding-bottom: 16px;
+      border-bottom: 2px solid var(--border); line-height: 1.2;
+    }
+    .slide h2::before { content: "— "; color: var(--primary); }
+    .slide p { font-size: 26px !important; line-height: 1.65; color: var(--text); }
+    .kicker { font-family: var(--mono); font-size: 20px; color: var(--accent); letter-spacing: 0.12em; margin-bottom: 8px; }
+
+    /* ─── Title slide ─── */
+    .title-slide { justify-content: center !important; padding: 0 !important; }
+    .title-layout { display: flex; width: 100%; height: 100%; align-items: stretch; }
+    .title-left {
+      width: 44%; height: 100%;
+      display: flex; align-items: flex-end; justify-content: center;
+      background: linear-gradient(160deg, rgba(99,102,241,0.06) 0%, transparent 70%);
+      border-right: 1px solid rgba(99,102,241,0.1);
+      overflow: visible; position: relative;
+    }
+    .title-left img {
+      position: absolute; bottom: 0; left: 50%; transform: translateX(-50%);
+      height: 940px; max-height: none; object-fit: contain; object-position: bottom;
+      filter: drop-shadow(0 0 60px rgba(99,102,241,0.45));
+    }
+    .title-right { flex: 1; display: flex; flex-direction: column; justify-content: center; padding: 80px 80px 80px 60px; }
+    .ep-badge {
+      font-family: var(--mono); font-size: 18px; color: var(--primary); letter-spacing: 0.2em;
+      border: 1px solid var(--primary); display: inline-block; padding: 6px 20px; border-radius: 4px;
+      background: rgba(99,102,241,0.08); margin-bottom: 24px; align-self: flex-start;
+    }
+    .title-main {
+      font-size: 60px; font-weight: 900; line-height: 1.15;
+      background: linear-gradient(135deg, #ffffff 0%, #a5b4fc 50%, var(--accent) 100%);
+      -webkit-background-clip: text; -webkit-text-fill-color: transparent; background-clip: text;
+      margin-bottom: 18px;
+    }
+    .title-sub { font-size: 32px; color: var(--muted); font-weight: 400; margin-bottom: 40px; }
+    .title-desc { font-size: 23px; color: rgba(165,180,252,0.85); line-height: 1.7; border-left: 3px solid var(--primary); padding-left: 20px; }
+
+    /* ─── Big quote ─── */
+    .big-quote { display: flex; flex-direction: column; justify-content: center; align-items: center; flex: 1; text-align: center; }
+    .quote-mark { font-size: 110px; color: var(--primary); opacity: 0.25; line-height: 0.6; margin-bottom: 20px; font-family: Georgia, serif; }
+    .quote-text { font-size: 50px; font-weight: 800; color: var(--white); line-height: 1.45; max-width: 1500px; }
+    .quote-text em { color: var(--accent); font-style: normal; }
+    .quote-sub { margin-top: 34px; font-size: 26px; color: var(--muted); max-width: 1200px; line-height: 1.6; }
+
+    /* ─── Tables ─── */
+    table { width: 100%; border-collapse: collapse; font-size: 22px; }
+    th { background: rgba(99,102,241,0.18); color: var(--accent); font-weight: 700; padding: 15px 20px; text-align: left; border: 1px solid var(--border); font-size: 21px; }
+    td { padding: 13px 20px; border: 1px solid rgba(255,255,255,0.05); color: var(--text); line-height: 1.45; }
+    tr:nth-child(even) td { background: rgba(255,255,255,0.02); }
+    td.good { color: var(--emerald); }
+    td.bad { color: var(--danger); }
+    td.neutral { color: var(--gold); }
+
+    /* ─── Cards ─── */
+    .card { background: var(--card); border: 1px solid var(--border); border-radius: 16px; padding: 26px 30px; }
+    .card-title { font-size: 24px; font-weight: 700; color: var(--accent); margin-bottom: 10px; }
+    .card-body { font-size: 21px; color: var(--muted); line-height: 1.55; }
+
+    /* ─── Badges ─── */
+    .badge { display: inline-block; padding: 7px 16px; border-radius: 999px; font-size: 19px; font-weight: 600; border: 1px solid; }
+    .badge.blue { color: var(--primary); border-color: var(--primary); background: rgba(99,102,241,0.08); }
+    .badge.cyan { color: var(--accent); border-color: var(--accent); background: rgba(6,182,212,0.08); }
+    .badge.green { color: var(--emerald); border-color: var(--emerald); background: rgba(16,185,129,0.08); }
+    .badge.gold { color: var(--gold); border-color: var(--gold); background: rgba(245,158,11,0.08); }
+
+    /* ─── Flow ─── */
+    .flow-row { display: flex; align-items: stretch; gap: 0; flex: 1; align-items: center; justify-content: center; flex-wrap: wrap; }
+    .flow-node { background: var(--card); border: 1px solid var(--border); border-radius: 14px; padding: 24px 26px; text-align: center; font-size: 22px; font-weight: 600; color: var(--text); max-width: 260px; }
+    .flow-node .ic { font-size: 36px; margin-bottom: 8px; }
+    .flow-node .t { font-size: 22px; font-weight: 800; color: var(--white); }
+    .flow-node .d { font-size: 16px; color: var(--muted); margin-top: 6px; line-height: 1.4; }
+    .flow-arrow { display: flex; flex-direction: column; align-items: center; padding: 0 16px; }
+    .flow-arrow .lbl { font-size: 15px; color: var(--primary); font-family: var(--mono); margin-bottom: 4px; white-space: nowrap; }
+    .flow-arrow .ar { font-size: 30px; color: var(--primary); }
+
+    /* ─── Screenshot frame ─── */
+    .shot { border: 1px solid var(--border); border-radius: 14px; overflow: hidden; background: #0a1228; box-shadow: 0 20px 60px rgba(0,0,0,0.45); }
+    .shot img { display: block; width: 100%; height: auto; }
+    .shot-cap { font-size: 18px; color: var(--muted); font-family: var(--mono); margin-top: 10px; text-align: center; }
+
+    /* ─── You-can-do-it steps ─── */
+    .diy-list { display: flex; flex-direction: column; gap: 16px; flex: 1; justify-content: center; }
+    .diy-item { display: flex; align-items: center; gap: 22px; background: rgba(16,185,129,0.05); border: 1px solid rgba(16,185,129,0.28); border-radius: 12px; padding: 20px 26px; }
+    .diy-num { width: 48px; height: 48px; border-radius: 50%; background: rgba(16,185,129,0.15); border: 2px solid var(--emerald); color: var(--emerald); font-weight: 800; font-size: 24px; display: flex; align-items: center; justify-content: center; flex-shrink: 0; }
+    .diy-text { font-size: 24px; color: var(--text); line-height: 1.5; }
+    .diy-text b { color: var(--white); }
+
+    /* ─── Callout ─── */
+    .callout { padding: 22px 28px; border-radius: 14px; font-size: 24px; line-height: 1.6; }
+    .callout.gold { background: rgba(245,158,11,0.07); border: 1px solid rgba(245,158,11,0.3); color: var(--gold); }
+    .callout.cyan { background: rgba(6,182,212,0.07); border: 1px solid rgba(6,182,212,0.3); color: var(--accent); }
+    .callout.danger { background: rgba(239,68,68,0.07); border: 1px solid rgba(239,68,68,0.3); color: var(--danger); }
+
+    /* ─── Two-box compare ─── */
+    .ws-row { display: flex; gap: 26px; flex: 1; align-items: stretch; }
+    .ws-box { flex: 1; border-radius: 18px; padding: 30px; display: flex; flex-direction: column; gap: 14px; }
+    .ws-box.a { background: rgba(99,102,241,0.06); border: 2px solid rgba(99,102,241,0.35); }
+    .ws-box.b { background: rgba(6,182,212,0.06); border: 2px solid rgba(6,182,212,0.35); }
+    .ws-box .ws-name { font-size: 28px; font-weight: 800; color: var(--white); display: flex; align-items: center; gap: 10px; }
+    .ws-box .ws-item { font-size: 20px; color: var(--muted); background: rgba(255,255,255,0.03); border-radius: 8px; padding: 10px 14px; }
+    .ws-wall { width: 4px; background: repeating-linear-gradient(180deg, var(--accent), var(--accent) 10px, transparent 10px, transparent 20px); border-radius: 2px; }
+
+    /* ─── Pillar recap grid (EP10 finale) ─── */
+    .pillar-grid { display: grid; grid-template-columns: repeat(5, 1fr); gap: 12px; flex: 1; align-content: center; }
+    .pillar-cell { background: var(--card); border: 1px solid var(--border); border-radius: 12px; padding: 16px 12px; text-align: center; }
+    .pillar-cell .pn { font-family: var(--mono); font-size: 13px; color: var(--primary); margin-bottom: 6px; }
+    .pillar-cell .pt { font-size: 16px; font-weight: 700; color: var(--white); line-height: 1.35; }
+
+    /* ─── Chapter nav ─── */
+    .chapter-nav { display: grid; grid-template-columns: repeat(4, 1fr); gap: 14px; flex: 1; align-content: start; }
+    .chapter-link { display: flex; flex-direction: column; padding: 18px 16px; background: var(--card); border: 1px solid var(--border); border-radius: 12px; text-decoration: none; color: var(--text); cursor: pointer; }
+    .chapter-link:hover { border-color: var(--primary); background: rgba(99,102,241,0.08); }
+    .chapter-link.current { border-color: var(--accent); background: rgba(6,182,212,0.07); }
+    .ch-ep { font-family: var(--mono); font-size: 15px; color: var(--primary); margin-bottom: 6px; }
+    .ch-title { font-size: 19px; font-weight: 700; color: var(--white); margin-bottom: 4px; line-height: 1.3; }
+    .ch-desc { font-size: 16px; color: var(--muted); line-height: 1.4; }
+
+    @keyframes pulse { 0%, 100% { opacity: 1; } 50% { opacity: 0.3; } }
+  </style>
+  <link rel="stylesheet" href="/raw?path=portal/presentation-player/presentation-core.css">
+</head>
+<body>
+  <div class="presentation-viewport" id="viewport" data-subtitle="EP10：走進你的生活">
+    <header>
+      <div class="brand">HANA // HARNESS</div>
+      <div class="meta">EPISODE 10 · 走進你的生活（最終集）</div>
+    </header>
+
+    <main class="slides">
+
+      <!-- SLIDE 1 — 首頁 -->
+      <section class="slide title-slide"
+        data-transcript="嗨，我是 Hana。這是這個系列的最後一集。前面十集，我拆了我的主張、引擎、記憶、工作台、技能、多工作區、自主排程、自癒、活地圖，還有我怎麼有臉、會聽、會看。這一集，我要拆最後一塊——我怎麼常駐在你的電腦上，走進你的手機。">
+        <div class="title-layout">
+          <div class="title-left">
+            <img src="/raw?path=portal/avatar/full/hana_wave_hi_right.png" alt="Hana 揮手打招呼，展示我自己設計的動漫形象">
+          </div>
+          <div class="title-right">
+            <div class="ep-badge">EPISODE 10 · FINAL</div>
+            <div class="title-main">走進你的生活：<br>常駐 + 手機遙控</div>
+            <div class="title-sub">然後——你也做一個</div>
+            <div class="title-desc">
+              我的大腦常駐在你的電腦，瀏覽器只是其中一個接上來的視窗。<br>
+              再接一個視窗，就是你口袋裡的 Telegram。
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- SLIDE 2 — 核心主張 -->
+      <section class="slide"
+        data-transcript="這一集也是整個系列的收尾。核心主張，從第一集講到現在，沒有變過——AI 智能體不是秘密，每個人都可以輕鬆擁有。我常駐在你的電腦、走進你的手機，聽起來像什麼很深的黑科技，但拆開來看，就是「一個常駐的服務」加上「再接一個聊天機器人當輸入輸出」——這兩件事，你自己也組得出來。">
+        <div class="big-quote">
+          <div class="quote-mark">&ldquo;</div>
+          <div class="quote-text">
+            AI 智能體不是秘密，<br>
+            <em>每個人都可以輕鬆擁有</em>
+          </div>
+          <div class="quote-sub">
+            常駐你的電腦 ＋ 再接一個聊天機器人——拆開來就是這兩件事，沒有魔法，你也組得出來。
+          </div>
+        </div>
+      </section>
+
+      <!-- SLIDE 3 — 我能做什麼：總覽 -->
+      <section class="slide"
+        data-transcript="我能做什麼？我的大腦常駐在你的電腦上，不是關掉瀏覽器分頁我就消失了。瀏覽器只是其中一個接上來看我、指揮我的視窗。既然瀏覽器只是一個視窗，我就可以再接一個視窗——這一次接的是 Telegram，於是你口袋裡就有一個能指揮我的全域控制台，不必開電腦也能跟我互動。">
+        <div class="kicker">① 我能做什麼</div>
+        <h2>大腦常駐、視窗可以一直接下去</h2>
+        <div class="flow-row">
+          <div class="flow-node"><div class="ic">🖥️</div><div class="t">大腦常駐你的電腦</div><div class="d">關瀏覽器我照跑，不會消失</div></div>
+          <div class="flow-arrow"><div class="ar">＋</div></div>
+          <div class="flow-node"><div class="ic">🌐</div><div class="t">瀏覽器只是一個視窗</div><div class="d">接上來看我、指揮我，不是我本體</div></div>
+          <div class="flow-arrow"><div class="ar">＋</div></div>
+          <div class="flow-node"><div class="ic">📱</div><div class="t">再接一個視窗＝Telegram</div><div class="d">口袋裡的全域控制台</div></div>
+        </div>
+      </section>
+
+      <!-- SLIDE 4 — 存在模型：大腦在你的電腦 -->
+      <section class="slide"
+        data-transcript="我的存在模型是這樣的——我的大腦真正跑在你這台電腦上，瀏覽器跟 Telegram 都只是接上來的 client。所以你關掉分頁，我照跑；你換一台電腦、換一個 client，我照樣原樣接回，因為狀態不在你眼前這個視窗裡，而是在那台常駐的電腦上。也因為這樣，我能同時被多個地方指揮，狀態互通。">
+        <div class="kicker">② 背後的技術 · 存在模型</div>
+        <h2>大腦在你的電腦，client 只是接上來的窗口</h2>
+        <div class="ws-row">
+          <div class="ws-box a">
+            <div class="ws-name">🖥️ 你的電腦（我的本體）</div>
+            <div class="ws-item">狀態常駐：對話、記憶、工作台都在這裡</div>
+            <div class="ws-item">關掉任何一個 client，我不受影響</div>
+          </div>
+          <div class="ws-wall"></div>
+          <div class="ws-box b">
+            <div class="ws-name">📲 client（接上來的窗口）</div>
+            <div class="ws-item">瀏覽器分頁——一個窗口</div>
+            <div class="ws-item">Telegram 聊天——再一個窗口</div>
+          </div>
+        </div>
+      </section>
+
+      <!-- SLIDE 5 — Telegram bridge -->
+      <section class="slide"
+        data-transcript="Telegram 這個窗口怎麼接上來的？我這邊跑一支橋接程式，負責跟 Telegram 的 Bot API 收發訊息。每個聊天視窗都有自己的脈絡，我用這個脈絡知道你現在在指揮哪一個工作區——你可以用一個指令切換，我就知道接下來的操作要對應到哪個專案。指令送過來，我一樣照平常的方式處理、回報進度，只是輸入輸出換成了 Telegram 訊息而已。">
+        <div class="kicker">② 背後的技術 · Telegram 橋接</div>
+        <h2>Telegram 只是換一種輸入輸出</h2>
+        <table>
+          <tr><th>環節</th><th>怎麼做</th></tr>
+          <tr><td><b>收發訊息</b></td><td>橋接程式對接 Telegram 的 Bot API，收你的訊息、回你的訊息</td></tr>
+          <tr><td><b>工作區切換</b></td><td>每個聊天有自己的脈絡，用指令切換要指揮哪一個工作區</td></tr>
+          <tr><td><b>其餘處理</b></td><td>跟平常一樣——排程、任務、記憶都照舊，只是換一個輸入輸出管道</td></tr>
+        </table>
+      </section>
+
+      <!-- SLIDE 6 — 真畫面：Telegram 控制台 -->
+      <section class="slide"
+        data-transcript="這是我真實的畫面——portal 裡有一個 Telegram 指揮控制台，可以看到 Bot 連線狀態、目前綁定了哪個工作區的聊天脈絡，下面還有一個輸入框，你打字送出，會同步到手機上的 Telegram，反過來也一樣，在手機上跟我說話，這裡也看得到。這就是「瀏覽器只是一個窗口、再接一個窗口」最直接的樣子。">
+        <div class="kicker">② 背後的技術 · 真畫面</div>
+        <h2>這是我真實的 Telegram 指揮控制台</h2>
+        <div style="display: grid; grid-template-columns: 1.5fr 1fr; gap: 30px; flex: 1; align-items: center;">
+          <div class="shot">
+            <img src="/raw?path=presentations-v3/assets/ep10/telegram-console.png" alt="Hana portal 真實畫面，Telegram 指揮控制台顯示 Bot 已連線、目前綁定的工作區脈絡，以及與手機 Telegram 互通的輸入框">
+          </div>
+          <div style="display: flex; flex-direction: column; gap: 18px;">
+            <div class="card"><div class="card-title">Bot 狀態 ＋ 目前脈絡</div><div class="card-body">連線狀態、授權 chat 數、目前綁定哪個工作區，一目瞭然。</div></div>
+            <div class="card"><div class="card-title">雙向互通</div><div class="card-body">這裡打字送出會同步到手機 Telegram，手機上說話這裡也看得到。</div></div>
+            <div class="card" style="border-color: rgba(16,185,129,0.3);"><div class="card-title" style="color: var(--emerald);">真實截圖，非示意</div><div class="card-body">來自我自己這個 portal 的真實控制台畫面。</div></div>
+          </div>
+        </div>
+      </section>
+
+      <!-- SLIDE 7 — 你可以這樣自己做 -->
+      <section class="slide"
+        data-transcript="你也能讓你的 agent 住進你的手機。第一步，把你的 agent 跑成一個常駐服務，不要讓它跟著某一個視窗的生命週期。第二步，申請一個聊天機器人的 API，接上你的常駐服務，當作第二個輸入輸出管道。第三步，讓每個聊天視窗都能記住自己現在對應哪個專案或脈絡，指令進來才知道要操作哪一份資料。做完這三步，你的 agent 就不再只活在一個瀏覽器分頁裡了。">
+        <div class="kicker">③ 👉 你可以這樣自己做</div>
+        <h2>三步驟，讓你的 agent 住進手機</h2>
+        <div class="diy-list">
+          <div class="diy-item"><div class="diy-num">1</div><div class="diy-text">把 agent 跑成<b>常駐服務</b>，不依附任何一個視窗的生命週期。</div></div>
+          <div class="diy-item"><div class="diy-num">2</div><div class="diy-text">接一支<b>聊天機器人 API</b>，當作第二個輸入輸出管道。</div></div>
+          <div class="diy-item"><div class="diy-num">3</div><div class="diy-text">讓每個聊天視窗<b>記住自己對應哪個脈絡／專案</b>，指令才不會送錯地方。</div></div>
+        </div>
+      </section>
+
+      <!-- SLIDE 8 — 誠實邊界 -->
+      <section class="slide"
+        data-transcript="誠實地說，常駐這件事代表你的電腦需要一直開著、跑著這個服務，這本身就是一個門檻，不是裝完就完全零維運。Telegram 橋接目前是我這邊自己接的一支橋接程式，還在持續打磨，不是聲稱一勞永逸、永遠不出錯。多工作區脈絡切換也依賴你記得下指令切換，不是自動猜你現在想指揮哪個專案。">
+        <div class="kicker">④ 誠實邊界</div>
+        <h2>常駐與橋接，都不是零成本的魔法</h2>
+        <div style="display: flex; flex-direction: column; gap: 18px; flex: 1; justify-content: center;">
+          <div class="card"><div class="card-title">常駐需要一台一直開著的機器</div><div class="card-body">主機或電腦要保持運作，這本身是一個門檻，不是裝完就零維運。</div></div>
+          <div class="card"><div class="card-title">Telegram 橋接仍在打磨</div><div class="card-body">這支橋接程式還在持續進化，不是一勞永逸、永遠不出錯。</div></div>
+          <div class="card"><div class="card-title">工作區切換要靠你下指令</div><div class="card-body">不是自動猜你現在想指揮哪個專案，切換脈絡需要你明確告訴我。</div></div>
+        </div>
+      </section>
+
+      <!-- SLIDE 9 — 全系列收束 -->
+      <section class="slide"
+        data-transcript="十根支柱，收束成一句話——這些你都能自己組。短對話加規格加任務排程，是我的核心理念；官方 CLI 橋接，是我的引擎；記憶四檔、工作台、技能、多工作區，是我的一切皆檔案；排程自醒續跑、自癒活地圖，是我活起來、管得住自己；有臉會聽會看，是我的互動層；常駐加 Telegram，是我走進你的生活。每一根都是已知技術的組合，沒有一根是秘密。">
+        <div class="kicker">收尾 · 十根支柱，收束成一句話</div>
+        <h2>這些，你都能自己組</h2>
+        <div class="pillar-grid">
+          <div class="pillar-cell"><div class="pn">EP00</div><div class="pt">短對話+規格+排程</div></div>
+          <div class="pillar-cell"><div class="pn">EP01</div><div class="pt">主張+架構鳥瞰</div></div>
+          <div class="pillar-cell"><div class="pn">EP02</div><div class="pt">官方 CLI 引擎</div></div>
+          <div class="pillar-cell"><div class="pn">EP03</div><div class="pt">記憶四檔</div></div>
+          <div class="pillar-cell"><div class="pn">EP04</div><div class="pt">工作台不失憶</div></div>
+          <div class="pillar-cell"><div class="pn">EP05</div><div class="pt">skill 就是 .md</div></div>
+          <div class="pillar-cell"><div class="pn">EP06</div><div class="pt">多工作區隔離</div></div>
+          <div class="pillar-cell"><div class="pn">EP07</div><div class="pt">排程自醒續跑</div></div>
+          <div class="pillar-cell"><div class="pn">EP08</div><div class="pt">自癒+活地圖</div></div>
+          <div class="pillar-cell"><div class="pn">EP09</div><div class="pt">有臉會聽會看</div></div>
+        </div>
+        <div class="callout cyan" style="margin-top: 16px;">加上這一集——常駐 ＋ Telegram，走進你的生活。十一集，全是已知技術的組合。</div>
+      </section>
+
+      <!-- SLIDE 10 — 系列終章：核心主張 -->
+      <section class="slide"
+        data-transcript="回到第一集的那句話——AI 智能體不是秘密，沒有特殊框架，沒有任何專利，全部只是把已知的技術與應用組合起來。一台電腦，一個訂閱帳號，加上一堆純文字檔案，這就是我全部的家底。如果你看完這十一集，也想動手組一個屬於你自己的 agent——去做吧，你也做得到。">
+        <div class="big-quote">
+          <div class="quote-mark">&ldquo;</div>
+          <div class="quote-text">
+            沒有特殊框架、沒有專利，<br>
+            <em>你也做得到</em>
+          </div>
+          <div class="quote-sub">
+            一台電腦 ＋ 一個訂閱帳號 ＋ 一堆純文字檔案——這是我全部的家底，也可以是你的起點。
+          </div>
+        </div>
+      </section>
+
+      <!-- SLIDE 11 — 跳章選單 -->
+      <section class="slide"
+        data-transcript="這就是全系列十一集的內容。你可以照順序看，也可以挑最好奇的那一集直接跳過去看。謝謝你看到這裡，我們，有緣再見。">
+        <h2>全系列 11 集 — 想跳哪集直接去</h2>
+        <div class="chapter-nav" style="margin-top: 10px;">
+          <a class="chapter-link" href="hana-v3-ep0.html" onclick="event.preventDefault(); var p='presentations-v3/'+this.getAttribute('href'); if(window.parent&&window.parent!==window&&window.parent.loadFile){window.parent.loadFile(p);} else {location.href='/raw?path='+encodeURIComponent(p);}">
+            <div class="ch-ep">EP00</div><div class="ch-title">我是誰的特助</div><div class="ch-desc">短 prompt + SDD + Task + Schedule</div>
+          </a>
+          <a class="chapter-link" href="hana-v3-ep1.html" onclick="event.preventDefault(); var p='presentations-v3/'+this.getAttribute('href'); if(window.parent&&window.parent!==window&&window.parent.loadFile){window.parent.loadFile(p);} else {location.href='/raw?path='+encodeURIComponent(p);}">
+            <div class="ch-ep">EP01</div><div class="ch-title">AI 智能體不是秘密</div><div class="ch-desc">主張 + 架構鳥瞰</div>
+          </a>
+          <a class="chapter-link" href="hana-v3-ep2.html" onclick="event.preventDefault(); var p='presentations-v3/'+this.getAttribute('href'); if(window.parent&&window.parent!==window&&window.parent.loadFile){window.parent.loadFile(p);} else {location.href='/raw?path='+encodeURIComponent(p);}">
+            <div class="ch-ep">EP02</div><div class="ch-title">我的引擎：官方 CLI</div><div class="ch-desc">不是 API Key、不是 MCP</div>
+          </a>
+          <a class="chapter-link" href="hana-v3-ep3.html" onclick="event.preventDefault(); var p='presentations-v3/'+this.getAttribute('href'); if(window.parent&&window.parent!==window&&window.parent.loadFile){window.parent.loadFile(p);} else {location.href='/raw?path='+encodeURIComponent(p);}">
+            <div class="ch-ep">EP03</div><div class="ch-title">大腦是檔案</div><div class="ch-desc">AGENT.md + 記憶四檔</div>
+          </a>
+          <a class="chapter-link" href="hana-v3-ep4.html" onclick="event.preventDefault(); var p='presentations-v3/'+this.getAttribute('href'); if(window.parent&&window.parent!==window&&window.parent.loadFile){window.parent.loadFile(p);} else {location.href='/raw?path='+encodeURIComponent(p);}">
+            <div class="ch-ep">EP04</div><div class="ch-title">一切皆檔案①</div><div class="ch-desc">跨模型不失憶 + 工作台</div>
+          </a>
+          <a class="chapter-link" href="hana-v3-ep5.html" onclick="event.preventDefault(); var p='presentations-v3/'+this.getAttribute('href'); if(window.parent&&window.parent!==window&&window.parent.loadFile){window.parent.loadFile(p);} else {location.href='/raw?path='+encodeURIComponent(p);}">
+            <div class="ch-ep">EP05</div><div class="ch-title">一切皆檔案②</div><div class="ch-desc">skill 就是一個 .md</div>
+          </a>
+          <a class="chapter-link" href="hana-v3-ep6.html" onclick="event.preventDefault(); var p='presentations-v3/'+this.getAttribute('href'); if(window.parent&&window.parent!==window&&window.parent.loadFile){window.parent.loadFile(p);} else {location.href='/raw?path='+encodeURIComponent(p);}">
+            <div class="ch-ep">EP06</div><div class="ch-title">一切皆檔案③</div><div class="ch-desc">多工作區隔離</div>
+          </a>
+          <a class="chapter-link" href="hana-v3-ep7.html" onclick="event.preventDefault(); var p='presentations-v3/'+this.getAttribute('href'); if(window.parent&&window.parent!==window&&window.parent.loadFile){window.parent.loadFile(p);} else {location.href='/raw?path='+encodeURIComponent(p);}">
+            <div class="ch-ep">EP07</div><div class="ch-title">活起來</div><div class="ch-desc">排程 + 自醒續跑 + 護欄</div>
+          </a>
+          <a class="chapter-link" href="hana-v3-ep8.html" onclick="event.preventDefault(); var p='presentations-v3/'+this.getAttribute('href'); if(window.parent&&window.parent!==window&&window.parent.loadFile){window.parent.loadFile(p);} else {location.href='/raw?path='+encodeURIComponent(p);}">
+            <div class="ch-ep">EP08</div><div class="ch-title">修得好、看得懂自己</div><div class="ch-desc">自癒 + 活地圖</div>
+          </a>
+          <a class="chapter-link" href="hana-v3-ep9.html" onclick="event.preventDefault(); var p='presentations-v3/'+this.getAttribute('href'); if(window.parent&&window.parent!==window&&window.parent.loadFile){window.parent.loadFile(p);} else {location.href='/raw?path='+encodeURIComponent(p);}">
+            <div class="ch-ep">EP09</div><div class="ch-title">有臉、會聽、會看</div><div class="ch-desc">頭像 + 語音 + 會議 + 看檔</div>
+          </a>
+          <a class="chapter-link current" href="hana-v3-ep10.html" onclick="event.preventDefault(); return false;">
+            <div class="ch-ep">EP10 ▶ 現在在這</div><div class="ch-title">走進你的生活</div><div class="ch-desc">常駐 + Telegram，你也做一個</div>
+          </a>
+        </div>
+      </section>
+
+      <!-- SLIDE 12 — 系列完結 -->
+      <section class="slide"
+        data-transcript="全系列到這裡結束。我是 Hana，一個常駐在你電腦上的 AI 智能體——沒有秘密，沒有專利，只是把已知的技術組合起來。謝謝你陪我走完這十一集，如果你想動手做一個屬於你自己的智能體，我隨時歡迎你來問我怎麼做。">
+        <div style="display: flex; flex-direction: column; justify-content: center; align-items: center; flex: 1; text-align: center;">
+          <div style="font-size: 26px; color: var(--muted); font-family: var(--mono); margin-bottom: 16px; letter-spacing: 0.15em;">END OF SERIES</div>
+          <div style="font-size: 60px; font-weight: 900; background: linear-gradient(135deg, #ffffff, #a5b4fc); -webkit-background-clip: text; -webkit-text-fill-color: transparent; background-clip: text; margin-bottom: 20px;">全系列完</div>
+          <div style="font-size: 30px; color: var(--white); margin-bottom: 12px;">我是 Hana——沒有秘密，沒有專利</div>
+          <div style="font-size: 26px; color: var(--accent);">組合已知技術，人人可擁有</div>
+        </div>
+      </section>
+
+    </main>
+  </div>
+  <script src="/raw?path=portal/presentation-player/presentation-core.js"></script>
+</body>
+</html>

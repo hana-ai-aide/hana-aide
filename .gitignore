@@ -1,0 +1,47 @@
+node_modules/
+# Shared Python venv for STT/meeting-transcription (machine-specific, multi-GB — never commit/deploy).
+# Lives at harness root so Deploy_Harness.ps1 (snapshots only portal/+docgraph/) never copies it.
+.venv/
+*.log
+.docgraph/
+.worktable/
+# This is the harness TOOL repo (public). Its own .harness/ is just local working state of the
+# agent operating on itself (personal memory + runtime) — never publish it. (User PROJECT repos
+# differ: ensureHarnessScaffold sets THEM to ignore only .harness/runtime/, keeping knowledge tracked.)
+.harness/
+# Global knowledge home (personal long-term memory: USER/AGENT + editable policy). Local only —
+# never publish it, even though it lives inside the harness install dir.
+global-knowledge/
+# Immutable versioned releases (self-heal). Local build artifacts; GitHub is the real version
+# control. Each .releases/vN is a read-only code snapshot; current.json/last-known-good.json are
+# the live/rollback pointers.
+.releases/
+# Scratch: avatar source art (the runtime PNGs live in portal/avatar/), old presentation drafts.
+hana_png/
+presentation-v*.html
+presentation.broken.bak
+# Scratch / debug / index — local working clutter, never publish.
+scratch/
+scratch_*
+diff.txt
+.codegraph/
+# ── Generated artifacts — large binaries, regenerate from source; never publish ──
+# pptx/mp4/wav/vtt 匯出（數十 MB，從 source deck 重生）
+presentations/exports/
+*.pptx
+*.mp4
+*.wav
+*.mp3
+# debug 截圖
+screen_shot/
+# Python bytecode (render-service 工具跑出來的)
+__pycache__/
+*.pyc
+
+# local scratch / backups (never share)
+.tmp/
+.issue/
+portal/avatar/full_bak/
+
+# v3 screenshot working-originals (decks use presentations-v3/assets/ copies)
+/runtime/

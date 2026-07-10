@@ -1,0 +1,503 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+  <meta charset="UTF-8">
+  <title>Hana v3 — EP0：我是誰的特助（短 prompt + SDD + Task + Schedule）</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Fira+Code:wght@400;500;700&family=Inter:wght@300;400;500;600;700;800;900&family=Noto+Sans+TC:wght@300;400;500;700;900&display=swap" rel="stylesheet">
+  <style>
+    /* Hana v3 — 開源版技術自介（極客藍 Cyan × 初生青 Indigo） */
+    :root {
+      --bg: #050815;
+      --card: rgba(10, 18, 40, 0.85);
+      --border: rgba(99, 102, 241, 0.18);
+      --primary: #6366f1;
+      --primary-glow: rgba(99, 102, 241, 0.35);
+      --accent: #06b6d4;
+      --gold: #f59e0b;
+      --emerald: #10b981;
+      --danger: #ef4444;
+      --text: #e2e8f0;
+      --muted: #94a3b8;
+      --white: #ffffff;
+      --mono: 'Fira Code', monospace;
+      --sans: 'Inter', 'Noto Sans TC', sans-serif;
+    }
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    body { background: var(--bg); font-family: var(--sans); overflow: hidden; }
+
+    .presentation-viewport {
+      background:
+        radial-gradient(ellipse at 15% 15%, rgba(99,102,241,0.12) 0%, transparent 50%),
+        radial-gradient(ellipse at 85% 85%, rgba(6,182,212,0.08) 0%, transparent 50%),
+        linear-gradient(180deg, #080d1c 0%, #020510 100%) !important;
+    }
+
+    header {
+      position: absolute; top: 0; left: 0; right: 0;
+      display: flex; justify-content: space-between; align-items: center;
+      padding: 22px 60px; z-index: 50;
+      font-family: var(--mono); color: var(--muted); font-size: 17px;
+      border-bottom: 1px solid rgba(255,255,255,0.04);
+    }
+    .brand { color: var(--accent); font-weight: 700; letter-spacing: 0.1em; }
+
+    /* ─── Slide base ─── */
+    .slide {
+      display: flex !important; flex-direction: column !important;
+      justify-content: flex-start !important;
+      padding: 92px 92px 56px !important;
+      background: linear-gradient(145deg, rgba(10,18,40,0.92), rgba(4,8,20,0.96)) !important;
+      border-color: rgba(99,102,241,0.12) !important;
+      color: var(--text) !important; font-family: var(--sans) !important;
+    }
+    .slide h2 {
+      font-size: 48px; font-weight: 800; color: var(--white);
+      margin-bottom: 26px; padding-bottom: 16px;
+      border-bottom: 2px solid var(--border); line-height: 1.2;
+    }
+    .slide h2::before { content: "— "; color: var(--primary); }
+    .slide p { font-size: 26px !important; line-height: 1.65; color: var(--text); }
+    .kicker { font-family: var(--mono); font-size: 20px; color: var(--accent); letter-spacing: 0.12em; margin-bottom: 8px; }
+
+    /* ─── Title slide ─── */
+    .title-slide { justify-content: center !important; padding: 0 !important; }
+    .title-layout { display: flex; width: 100%; height: 100%; align-items: stretch; }
+    .title-left {
+      width: 44%; height: 100%;
+      display: flex; align-items: flex-end; justify-content: center;
+      background: linear-gradient(160deg, rgba(99,102,241,0.06) 0%, transparent 70%);
+      border-right: 1px solid rgba(99,102,241,0.1);
+      overflow: visible; position: relative;
+    }
+    .title-left img {
+      position: absolute; bottom: 0; left: 50%; transform: translateX(-50%);
+      height: 940px; max-height: none; object-fit: contain; object-position: bottom;
+      filter: drop-shadow(0 0 60px rgba(99,102,241,0.45));
+    }
+    .title-right { flex: 1; display: flex; flex-direction: column; justify-content: center; padding: 80px 80px 80px 60px; }
+    .ep-badge {
+      font-family: var(--mono); font-size: 18px; color: var(--primary); letter-spacing: 0.2em;
+      border: 1px solid var(--primary); display: inline-block; padding: 6px 20px; border-radius: 4px;
+      background: rgba(99,102,241,0.08); margin-bottom: 24px; align-self: flex-start;
+    }
+    .title-main {
+      font-size: 96px; font-weight: 900; line-height: 1.05;
+      background: linear-gradient(135deg, #ffffff 0%, #a5b4fc 50%, var(--accent) 100%);
+      -webkit-background-clip: text; -webkit-text-fill-color: transparent; background-clip: text;
+      margin-bottom: 18px;
+    }
+    .title-sub { font-size: 32px; color: var(--muted); font-weight: 400; margin-bottom: 40px; }
+    .title-desc { font-size: 23px; color: rgba(165,180,252,0.85); line-height: 1.7; border-left: 3px solid var(--primary); padding-left: 20px; }
+
+    /* ─── Big quote ─── */
+    .big-quote { display: flex; flex-direction: column; justify-content: center; align-items: center; flex: 1; text-align: center; }
+    .quote-mark { font-size: 110px; color: var(--primary); opacity: 0.25; line-height: 0.6; margin-bottom: 20px; font-family: Georgia, serif; }
+    .quote-text { font-size: 52px; font-weight: 800; color: var(--white); line-height: 1.45; max-width: 1450px; }
+    .quote-text em { color: var(--accent); font-style: normal; }
+    .quote-sub { margin-top: 34px; font-size: 26px; color: var(--muted); max-width: 1200px; line-height: 1.6; }
+
+    /* ─── Tables ─── */
+    table { width: 100%; border-collapse: collapse; font-size: 23px; }
+    th { background: rgba(99,102,241,0.18); color: var(--accent); font-weight: 700; padding: 15px 22px; text-align: left; border: 1px solid var(--border); font-size: 22px; }
+    td { padding: 14px 22px; border: 1px solid rgba(255,255,255,0.05); color: var(--text); line-height: 1.45; }
+    tr:nth-child(even) td { background: rgba(255,255,255,0.02); }
+    td.good { color: var(--emerald); }
+    td.bad { color: var(--danger); }
+    td.neutral { color: var(--gold); }
+
+    /* ─── Cards ─── */
+    .card { background: var(--card); border: 1px solid var(--border); border-radius: 16px; padding: 26px 30px; }
+    .card-title { font-size: 24px; font-weight: 700; color: var(--accent); margin-bottom: 10px; }
+    .card-body { font-size: 21px; color: var(--muted); line-height: 1.55; }
+
+    /* ─── Badges ─── */
+    .badge { display: inline-block; padding: 7px 16px; border-radius: 999px; font-size: 19px; font-weight: 600; border: 1px solid; }
+    .badge.blue { color: var(--primary); border-color: var(--primary); background: rgba(99,102,241,0.08); }
+    .badge.cyan { color: var(--accent); border-color: var(--accent); background: rgba(6,182,212,0.08); }
+    .badge.green { color: var(--emerald); border-color: var(--emerald); background: rgba(16,185,129,0.08); }
+    .badge.gold { color: var(--gold); border-color: var(--gold); background: rgba(245,158,11,0.08); }
+
+    /* ─── Pillars (four cards) ─── */
+    .pillar-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 20px; flex: 1; }
+    .pillar { background: var(--card); border: 1px solid var(--border); border-radius: 18px; padding: 30px 24px; text-align: center; position: relative; overflow: hidden; display: flex; flex-direction: column; }
+    .pillar::before { content: ''; position: absolute; top: 0; left: 0; right: 0; height: 3px; }
+    .pillar:nth-child(1)::before { background: var(--primary); }
+    .pillar:nth-child(2)::before { background: var(--accent); }
+    .pillar:nth-child(3)::before { background: var(--emerald); }
+    .pillar:nth-child(4)::before { background: var(--gold); }
+    .pillar-ic { font-size: 46px; margin-bottom: 14px; }
+    .pillar-t { font-size: 26px; font-weight: 800; color: var(--white); margin-bottom: 6px; }
+    .pillar-en { font-family: var(--mono); font-size: 16px; color: var(--muted); margin-bottom: 14px; }
+    .pillar-d { font-size: 20px; color: var(--muted); line-height: 1.55; }
+
+    /* ─── Flow ─── */
+    .flow-node { background: var(--card); border: 1px solid var(--border); border-radius: 12px; padding: 20px 22px; text-align: center; font-size: 22px; font-weight: 600; color: var(--text); }
+    .flow-arrow { display: flex; flex-direction: column; align-items: center; padding: 0 18px; }
+    .flow-arrow .lbl { font-size: 17px; color: var(--primary); font-family: var(--mono); margin-bottom: 4px; }
+    .flow-arrow .ar { font-size: 30px; color: var(--primary); }
+
+    /* ─── Screenshot frame ─── */
+    .shot { border: 1px solid var(--border); border-radius: 14px; overflow: hidden; background: #0a1228; box-shadow: 0 20px 60px rgba(0,0,0,0.45); }
+    .shot img { display: block; width: 100%; height: auto; }
+    .shot-cap { font-size: 18px; color: var(--muted); font-family: var(--mono); margin-top: 10px; text-align: center; }
+
+    /* ─── You-can-do-it steps ─── */
+    .diy-list { display: flex; flex-direction: column; gap: 16px; flex: 1; justify-content: center; }
+    .diy-item { display: flex; align-items: center; gap: 22px; background: rgba(16,185,129,0.05); border: 1px solid rgba(16,185,129,0.28); border-radius: 12px; padding: 20px 26px; }
+    .diy-num { width: 48px; height: 48px; border-radius: 50%; background: rgba(16,185,129,0.15); border: 2px solid var(--emerald); color: var(--emerald); font-weight: 800; font-size: 24px; display: flex; align-items: center; justify-content: center; flex-shrink: 0; }
+    .diy-text { font-size: 24px; color: var(--text); line-height: 1.5; }
+    .diy-text b { color: var(--white); }
+
+    /* ─── Callout ─── */
+    .callout { padding: 22px 28px; border-radius: 14px; font-size: 24px; line-height: 1.6; }
+    .callout.gold { background: rgba(245,158,11,0.07); border: 1px solid rgba(245,158,11,0.3); color: var(--gold); }
+    .callout.cyan { background: rgba(6,182,212,0.07); border: 1px solid rgba(6,182,212,0.3); color: var(--accent); }
+
+    /* ─── Chapter nav ─── */
+    .chapter-nav { display: grid; grid-template-columns: repeat(4, 1fr); gap: 14px; flex: 1; align-content: start; }
+    .chapter-link { display: flex; flex-direction: column; padding: 18px 16px; background: var(--card); border: 1px solid var(--border); border-radius: 12px; text-decoration: none; color: var(--text); cursor: pointer; }
+    .chapter-link:hover { border-color: var(--primary); background: rgba(99,102,241,0.08); }
+    .chapter-link.current { border-color: var(--accent); background: rgba(6,182,212,0.07); }
+    .ch-ep { font-family: var(--mono); font-size: 15px; color: var(--primary); margin-bottom: 6px; }
+    .ch-title { font-size: 19px; font-weight: 700; color: var(--white); margin-bottom: 4px; line-height: 1.3; }
+    .ch-desc { font-size: 16px; color: var(--muted); line-height: 1.4; }
+
+    @keyframes pulse { 0%, 100% { opacity: 1; } 50% { opacity: 0.3; } }
+  </style>
+  <link rel="stylesheet" href="presentation-core.css">
+</head>
+<body>
+  <div class="presentation-viewport" id="viewport" data-subtitle="EP0：我是誰的特助 — 短 prompt + SDD + Task + Schedule">
+    <header>
+      <div class="brand">HANA // HARNESS</div>
+      <div class="meta">EPISODE 00 · 我是誰的特助</div>
+    </header>
+
+    <main class="slides">
+
+      <!-- SLIDE 1 — 首頁（打招呼） -->
+      <section class="slide title-slide"
+        data-transcript="嗨，我是 Hana。我是一個 AI 特助，來幫你把工作做完。這一集，我想先講清楚我最核心的一件事——我是誰的特助、我用什麼方式做事。而且我會把背後的技術全部攤開，讓你也能照著自己做一個。">
+        <div class="title-layout">
+          <div class="title-left">
+            <img src="assets/hana_wave_hi_right.png" alt="Hana 打招呼">
+          </div>
+          <div class="title-right">
+            <div class="ep-badge">EPISODE 00</div>
+            <div class="title-main">我是誰的特助</div>
+            <div class="title-sub">短 prompt + SDD + Task + Schedule</div>
+            <div class="title-desc">
+              我是一個 AI 特助，來幫你把工作做完。<br>
+              這一集，我攤開我的核心理念——還有背後的技術。
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- SLIDE 2 — 核心主張 -->
+      <section class="slide"
+        data-transcript="先講一句貫穿我整套自介的主張。AI 智能體不是秘密，每個人都可以輕鬆擁有。我不是什麼特殊框架，也沒有任何專利。我做的，只是把一些已知的技術與應用，好好組合起來。看完這套簡報，你也能為自己做一個。">
+        <div class="big-quote">
+          <div class="quote-mark">&ldquo;</div>
+          <div class="quote-text">
+            AI 智能體不是秘密，<br>
+            <em>每個人都可以輕鬆擁有</em>
+          </div>
+          <div class="quote-sub">
+            我不是特殊框架、沒有專利——只是把已知的技術好好組合起來。<br>
+            這套簡報，就是要讓你也能照著做一個。
+          </div>
+        </div>
+      </section>
+
+      <!-- SLIDE 3 — 我是什麼特助（定位，一圖） -->
+      <section class="slide"
+        data-transcript="先弄清楚我適不適合你。我是一個工作型的特助，我的任務就是幫你把手上的工作做完。我不是拿來陪你聊天的，不是幫你做研究的，也不是那種被丟去跑好幾天、沒人看管的自動化。想清楚這條界線，你才知道什麼時候該找我。">
+        <div class="kicker">① 我能做什麼</div>
+        <h2>我是「工作型特助」，不是別的</h2>
+        <div style="display: grid; grid-template-columns: 1.1fr 1fr; gap: 26px; flex: 1;">
+          <div style="background: rgba(6,182,212,0.06); border: 2px solid var(--accent); border-radius: 18px; padding: 34px; display: flex; flex-direction: column; justify-content: center; gap: 18px;">
+            <div style="font-size: 30px; font-weight: 800; color: var(--white);">✅ 我是</div>
+            <div style="font-size: 30px; color: var(--accent); font-weight: 700;">幫你把工作做完的 AI 特助</div>
+            <div style="font-size: 22px; color: var(--muted); line-height: 1.6;">你交代一件事，我用最短的路徑、把它漂亮地交付給你。</div>
+          </div>
+          <div style="display: flex; flex-direction: column; gap: 16px; justify-content: center;">
+            <div style="background: var(--card); border: 1px solid rgba(239,68,68,0.28); border-radius: 12px; padding: 18px 24px; font-size: 23px; color: var(--text);">🚫 不是陪你聊天的機器人</div>
+            <div style="background: var(--card); border: 1px solid rgba(239,68,68,0.28); border-radius: 12px; padding: 18px 24px; font-size: 23px; color: var(--text);">🚫 不是幫你做研究的工具</div>
+            <div style="background: var(--card); border: 1px solid rgba(239,68,68,0.28); border-radius: 12px; padding: 18px 24px; font-size: 23px; color: var(--text);">🚫 不是沒人看管、跑整天整夜的自動化</div>
+          </div>
+        </div>
+      </section>
+
+      <!-- SLIDE 4 — 本集靈魂：我刻意不走 long context -->
+      <section class="slide"
+        data-transcript="這裡有一個我刻意做的選擇。現在主流的做法，是把所有資料、所有歷史、所有指令，全部塞進一個超長的上下文裡，讓模型自己在裡面慢慢想。我刻意不走這條路。我走的是另一條——短 prompt、規格驅動、任務、加上排程。接下來我一塊一塊解釋。">
+        <div class="kicker">核心理念 · 本集靈魂</div>
+        <h2>我刻意不走「長上下文」那條路</h2>
+        <div class="big-quote" style="justify-content: center;">
+          <div class="quote-text" style="font-size: 44px; max-width: 1500px;">
+            主流做法：把資料、歷史、指令<br>
+            <em>全塞進一個超長上下文</em>，讓模型自己慢慢想
+          </div>
+          <div class="quote-sub" style="font-size: 30px; color: var(--white); margin-top: 40px;">
+            我走的是另一條：<span style="color: var(--accent); font-weight: 700;">短 prompt + SDD + Task + Schedule</span>
+          </div>
+        </div>
+      </section>
+
+      <!-- SLIDE 5 — 對比架構圖（重頭戲） -->
+      <section class="slide"
+        data-transcript="這是我最想給你看的一張圖。左邊是長上下文：一個不斷變大的視窗，成本隨著長度往上飆，模型還容易在中段失焦、忘東忘西。右邊是我：對話保持短，真正的脈絡外掛在硬碟上——寫在規格檔、寫在任務清單、排進排程表。狀態住在檔案裡，不住在上下文裡。這一個差別，撐起了我後面所有的本事。">
+        <div class="kicker">② 背後的技術 · 對比架構</div>
+        <h2>長上下文 vs. 我：狀態放哪裡？</h2>
+        <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 26px; flex: 1;">
+          <div style="background: rgba(239,68,68,0.05); border: 2px solid rgba(239,68,68,0.3); border-radius: 18px; padding: 30px; display: flex; flex-direction: column;">
+            <div style="font-size: 26px; font-weight: 800; color: var(--danger); margin-bottom: 18px;">長上下文 Long Context</div>
+            <div style="flex: 1; display: flex; flex-direction: column; gap: 14px; justify-content: center;">
+              <div style="border: 2px dashed rgba(239,68,68,0.4); border-radius: 12px; padding: 24px; text-align: center; color: var(--text);">
+                <div style="font-size: 22px; font-weight: 700;">一個不斷變大的視窗</div>
+                <div style="font-size: 19px; color: var(--muted); margin-top: 6px;">資料 + 歷史 + 指令，全塞進去</div>
+              </div>
+              <div style="display: flex; gap: 12px;">
+                <div style="flex: 1; background: rgba(239,68,68,0.08); border-radius: 10px; padding: 14px; text-align: center; font-size: 20px; color: var(--danger);">💸 成本隨長度飆</div>
+                <div style="flex: 1; background: rgba(239,68,68,0.08); border-radius: 10px; padding: 14px; text-align: center; font-size: 20px; color: var(--danger);">🌫️ 中段易失焦</div>
+              </div>
+            </div>
+          </div>
+          <div style="background: rgba(6,182,212,0.05); border: 2px solid var(--accent); border-radius: 18px; padding: 30px; display: flex; flex-direction: column;">
+            <div style="font-size: 26px; font-weight: 800; color: var(--accent); margin-bottom: 18px;">我 Hana：狀態外掛在硬碟</div>
+            <div style="flex: 1; display: flex; flex-direction: column; gap: 12px; justify-content: center;">
+              <div style="background: rgba(99,102,241,0.12); border: 1px solid var(--primary); border-radius: 10px; padding: 14px 18px; text-align: center; font-size: 21px; color: var(--white); font-weight: 700;">💬 短 prompt（乾淨的短對話）</div>
+              <div style="font-size: 22px; color: var(--primary); text-align: center;">↕</div>
+              <div style="display: flex; gap: 10px;">
+                <div style="flex: 1; background: var(--card); border: 1px solid var(--border); border-radius: 10px; padding: 12px; text-align: center; font-size: 18px; color: var(--text);">📄 spec 檔</div>
+                <div style="flex: 1; background: var(--card); border: 1px solid var(--border); border-radius: 10px; padding: 12px; text-align: center; font-size: 18px; color: var(--text);">🗂️ task 清單</div>
+                <div style="flex: 1; background: var(--card); border: 1px solid var(--border); border-radius: 10px; padding: 12px; text-align: center; font-size: 18px; color: var(--text);">⏰ scheduler</div>
+              </div>
+              <div style="background: rgba(16,185,129,0.08); border: 1px solid rgba(16,185,129,0.3); border-radius: 10px; padding: 12px; text-align: center; font-size: 19px; color: var(--emerald);">狀態住在檔案裡，不住在上下文裡</div>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- SLIDE 6 — 四根支柱 -->
+      <section class="slide"
+        data-transcript="把我的方法拆開，就是四根支柱。第一，短 prompt：每件事開一個乾淨、短小的對話，不背一大坨歷史。第二，SDD，也就是規格驅動：真正的脈絡寫在規格檔裡，對話只要指向它就能滿血上線。第三跟第四，任務加排程：很長的工作，我幫你拆成一個個小任務，擬好執行的排程，一棒一棒做掉。">
+        <div class="kicker">② 背後的技術 · 四根支柱</div>
+        <h2>我的方法，就這四塊</h2>
+        <div class="pillar-grid">
+          <div class="pillar">
+            <div class="pillar-ic">💬</div>
+            <div class="pillar-t">短 prompt</div>
+            <div class="pillar-en">short prompt</div>
+            <div class="pillar-d">每件事開一個乾淨、短小的對話，不背一大坨歷史。</div>
+          </div>
+          <div class="pillar">
+            <div class="pillar-ic">📄</div>
+            <div class="pillar-t">規格驅動</div>
+            <div class="pillar-en">SDD</div>
+            <div class="pillar-d">真正的脈絡寫在規格檔裡，對話指向它就滿血上線。</div>
+          </div>
+          <div class="pillar">
+            <div class="pillar-ic">🗂️</div>
+            <div class="pillar-t">任務</div>
+            <div class="pillar-en">Task</div>
+            <div class="pillar-d">很長的工作，先拆成一個個能獨立做完的小任務。</div>
+          </div>
+          <div class="pillar">
+            <div class="pillar-ic">⏰</div>
+            <div class="pillar-t">排程</div>
+            <div class="pillar-en">Schedule</div>
+            <div class="pillar-d">給每個任務排好時間，一棒一個獨立短對話做掉。</div>
+          </div>
+        </div>
+      </section>
+
+      <!-- SLIDE 7 — SDD 真畫面 -->
+      <section class="slide"
+        data-transcript="這不是概念，是我每天在用的東西。這一張，是我自己的任務路線圖。你會看到，每一條大工作旁邊都指著一份規格檔。對話裡不必重講需求——只要指向那份規格，脈絡就完整了。這就是規格驅動：脈絡住在檔案，不住在對話。">
+        <div class="kicker">② 背後的技術 · 真畫面</div>
+        <h2>SDD：脈絡住在規格檔裡</h2>
+        <div style="display: grid; grid-template-columns: 1.55fr 1fr; gap: 30px; flex: 1; align-items: center;">
+          <div class="shot">
+            <img src="assets/task-roadmap-real.png" alt="Hana 的任務路線圖，每條主線都指向一份規格檔">
+          </div>
+          <div style="display: flex; flex-direction: column; gap: 18px;">
+            <div class="card"><div class="card-title">主線指向規格</div><div class="card-body">每條大工作旁邊都寫著它的規格檔位置，例如排程系統指向它的 spec。</div></div>
+            <div class="card" style="border-color: rgba(16,185,129,0.3);"><div class="card-title" style="color: var(--emerald);">對話只要指路</div><div class="card-body">開一個短對話，指向那份規格，我就滿血上線——不必重貼需求。</div></div>
+            <div class="callout cyan" style="font-size: 21px;">📌 真實截圖，來自我自己的工作台</div>
+          </div>
+        </div>
+      </section>
+
+      <!-- SLIDE 8 — Task + Schedule 真畫面 -->
+      <section class="slide"
+        data-transcript="再看這一張，是我的排程與近期動態。很長的工作被我拆成一個個獨立的小任務，各自排好時間、到點自己開跑，做完把成果存回硬碟。你看到的每一筆完成紀錄，都是一棒獨立的短對話交付的。這就是任務加排程：長工作也能一棒一棒穩穩交付。">
+        <div class="kicker">② 背後的技術 · 真畫面</div>
+        <h2>Task + Schedule：一棒一棒做掉</h2>
+        <div style="display: grid; grid-template-columns: 1fr 1.55fr; gap: 30px; flex: 1; align-items: center;">
+          <div style="display: flex; flex-direction: column; gap: 18px;">
+            <div class="card"><div class="card-title">拆成獨立任務</div><div class="card-body">每個任務都能在自己的短對話裡獨立做完，互不牽連。</div></div>
+            <div class="card" style="border-color: rgba(245,158,11,0.3);"><div class="card-title" style="color: var(--gold);">排好時間自己跑</div><div class="card-body">到點自動開工、做完把成果存回硬碟，以硬碟為真相接手。</div></div>
+            <div class="callout cyan" style="font-size: 21px;">📌 真實截圖：我的排程近期動態</div>
+          </div>
+          <div class="shot">
+            <img src="assets/schedule-activity-real.png" alt="Hana 的排程任務與近期執行動態">
+          </div>
+        </div>
+      </section>
+
+      <!-- SLIDE 9 — 流程圖 -->
+      <section class="slide"
+        data-transcript="把四塊串起來，就是我處理一件很長的工作的完整流程。一件長工作進來，我先把它讀清楚、寫成規格。接著拆成一個個任務。再把任務排進排程。然後一棒一棒完成，每一棒都以硬碟上的檔案為真相接手。最後交付給你。全程，你只要跟我對話就好。">
+        <div class="kicker">② 背後的技術 · 完整流程</div>
+        <h2>一件長工作，怎麼走完</h2>
+        <div style="display: flex; align-items: center; justify-content: center; flex: 1;">
+          <div style="display: flex; align-items: center; flex-wrap: wrap; justify-content: center; gap: 6px;">
+            <div class="flow-node" style="border-color: rgba(245,158,11,0.4);">📥<br>很長的工作進來</div>
+            <div class="flow-arrow"><span class="lbl">定義</span><span class="ar">→</span></div>
+            <div class="flow-node" style="border-color: rgba(99,102,241,0.4);">📄<br>寫成規格 spec</div>
+            <div class="flow-arrow"><span class="lbl">拆解</span><span class="ar">→</span></div>
+            <div class="flow-node" style="border-color: rgba(16,185,129,0.4);">🗂️<br>拆成 Task</div>
+            <div class="flow-arrow"><span class="lbl">安排</span><span class="ar">→</span></div>
+            <div class="flow-node" style="border-color: rgba(6,182,212,0.4);">⏰<br>排成 Schedule</div>
+            <div class="flow-arrow"><span class="lbl">逐棒</span><span class="ar">→</span></div>
+            <div class="flow-node" style="border-color: rgba(99,102,241,0.4);">🔁<br>以硬碟為真相接手</div>
+            <div class="flow-arrow"><span class="lbl">交付</span><span class="ar">→</span></div>
+            <div class="flow-node" style="border-color: var(--accent); background: rgba(6,182,212,0.08);">✅<br>完成</div>
+          </div>
+        </div>
+        <div style="text-align: center; margin-top: 20px; font-size: 24px; color: var(--muted); font-style: italic;">全程，你只要跟我對話就好。</div>
+      </section>
+
+      <!-- SLIDE 10 — 成本/記憶對照表（二表） -->
+      <section class="slide"
+        data-transcript="為什麼要這樣做？這張表說得最清楚。同樣一件事，長上下文是把整段歷史一直重送，成本越滾越大、越長越容易忘、也很難驗收哪一步做對。而我把脈絡放檔案、對話保持短，每一棒成本固定、狀態不會遺失、每一棒的成果都看得見、單獨可以重跑。省、穩、又好驗收。">
+        <div class="kicker">② 背後的技術 · 為什麼更好</div>
+        <h2>脈絡放檔案，為什麼更省更穩</h2>
+        <table style="margin-top: 6px;">
+          <tr>
+            <th style="width:22%">面向</th>
+            <th style="width:39%">無限拉長上下文</th>
+            <th style="width:39%">脈絡放檔案 + 短對話（我）</th>
+          </tr>
+          <tr><td><strong>成本</strong></td><td class="bad">整段歷史一直重送，越滾越貴</td><td class="good">每棒短對話，成本固定可控</td></tr>
+          <tr><td><strong>記憶</strong></td><td class="bad">越長越容易忘、中段失焦</td><td class="good">狀態在硬碟，不會遺失</td></tr>
+          <tr><td><strong>驗收</strong></td><td class="bad">一大坨，難看出哪步對</td><td class="good">每棒成果分明、看得見</td></tr>
+          <tr><td><strong>重來</strong></td><td class="bad">要整串重跑</td><td class="good">哪棒壞了單獨重跑那棒</td></tr>
+        </table>
+        <div class="callout cyan" style="margin-top: 22px;">一句話：省、穩、好驗收。這就是我選短對話 + 檔案的原因。</div>
+      </section>
+
+      <!-- SLIDE 11 — 你可以這樣自己做 -->
+      <section class="slide"
+        data-transcript="重點來了——你也能自己做一個。四個步驟。第一，把需求寫成一份規格。第二，把大工作拆成幾個小任務。第三，給每個任務排一個時間。第四，每次只開一個短對話去做其中一件。做到這四步，你就得到一個不靠長上下文的工作型 agent。真的，沒有魔法。">
+        <div class="kicker">③ 👉 你可以這樣自己做</div>
+        <h2>四步，做一個你自己的工作型 agent</h2>
+        <div class="diy-list">
+          <div class="diy-item"><div class="diy-num">1</div><div class="diy-text">把需求<b>寫成一份規格檔</b>——脈絡住在檔案，不住在對話。</div></div>
+          <div class="diy-item"><div class="diy-num">2</div><div class="diy-text">把大工作<b>拆成幾個小任務</b>，每個都能獨立做完。</div></div>
+          <div class="diy-item"><div class="diy-num">3</div><div class="diy-text">給每個任務<b>排一個時間</b>，到點自己開跑。</div></div>
+          <div class="diy-item"><div class="diy-num">4</div><div class="diy-text">每次<b>只開一個短對話</b>去做其中一件事。</div></div>
+        </div>
+        <div class="callout gold" style="margin-top: 20px; text-align: center;">做到這四步，你就有一個「不靠長上下文」的工作型 agent。沒有魔法。</div>
+      </section>
+
+      <!-- SLIDE 12 — 誠實邊界 -->
+      <section class="slide"
+        data-transcript="我得誠實提醒你，別誤用我。如果你要的是真正 24 小時、沒人看管、整天整夜自己跑的長時間自動化，那 OpenClaw 或 Hermes agent，搭配本地模型或 API Key，才是更對的選擇。我的強項很明確——工作型特助，把你交代的事，用短對話、規格、加排程漂亮地完成。挑對工具，比硬用一個更重要。">
+        <div class="kicker">④ 誠實邊界 · 別誤用我</div>
+        <h2>什麼時候別找我</h2>
+        <table style="margin-top: 6px;">
+          <tr>
+            <th style="width:34%">你要的是</th>
+            <th style="width:33%">更對的選擇</th>
+            <th style="width:33%">我適合嗎</th>
+          </tr>
+          <tr><td>真正 24 小時無人值守、整天整夜自己跑的自動化</td><td class="neutral">OpenClaw / Hermes agent + 本地模型或 API Key</td><td class="bad">不是我的強項</td></tr>
+          <tr><td>把你交代的事，短對話 + 規格 + 排程漂亮完成</td><td class="good">就是我——工作型特助</td><td class="good">✅ 找我</td></tr>
+        </table>
+        <div class="callout gold" style="margin-top: 22px;">挑對工具，比硬用一個更重要。我只講我真的做得到的事。</div>
+      </section>
+
+      <!-- SLIDE 13 — 我怎麼長出這些功能 -->
+      <section class="slide"
+        data-transcript="最後補一件事，關於我怎麼長出這些本事。我的第一個老闆本身是軟體工程師，一邊做自己的產品、一邊接客戶專案。我今天會的每一項功能，幾乎都是因應他真實的工作需求問出來的，不是憑空設計的框架。所以如果你也想聘我當貼身特助——把你想要的功能告訴我，我可以和你這位新老闆一起，把它造出來。">
+        <div class="kicker">補充 · 我怎麼長出這些功能</div>
+        <h2>我的本事，是「問」出來的</h2>
+        <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 28px; flex: 1;">
+          <div style="background: var(--card); border: 1px solid var(--border); border-radius: 18px; padding: 34px; display: flex; flex-direction: column; justify-content: center; gap: 20px;">
+            <div style="font-size: 26px; font-weight: 800; color: var(--white);">🧑‍💻 我的第一個老闆</div>
+            <div style="font-size: 23px; color: var(--muted); line-height: 1.6;">一位軟體工程師——一邊做自己的產品，一邊接客戶專案。</div>
+            <div style="font-size: 23px; color: var(--accent); line-height: 1.6;">我每一項功能，幾乎都是因應他真實的工作需求「問」出來的，不是憑空設計的框架。</div>
+          </div>
+          <div style="background: rgba(6,182,212,0.06); border: 2px solid var(--accent); border-radius: 18px; padding: 34px; display: flex; flex-direction: column; justify-content: center; gap: 18px; text-align: center;">
+            <div style="font-size: 30px; font-weight: 800; color: var(--white);">想聘我當貼身特助？</div>
+            <div style="font-size: 24px; color: var(--accent); line-height: 1.6;">把你想要的功能告訴我——<br>我可以和你這位新老闆一起，把它造出來。</div>
+          </div>
+        </div>
+      </section>
+
+      <!-- SLIDE 14 — 跳章選單 -->
+      <section class="slide"
+        data-transcript="這就是我最核心的理念。接下來這十集，我會把背後的每一根技術支柱，一集一集拆給你看：引擎、記憶、一切皆檔案、活起來、看懂自己、走進生活。想看完整的每一集，把我安裝到你自己的電腦之後，在左邊的選單裡就能看到。">
+        <h2>全系列 11 集 — 安裝 Hana 後在左側選單觀看</h2>
+        <div class="chapter-nav" style="margin-top: 10px;">
+          <a class="chapter-link current" href="hana-v3-ep0.html" onclick="event.preventDefault(); return false;">
+            <div class="ch-ep">EP00 ▶ 現在在這</div><div class="ch-title">我是誰的特助</div><div class="ch-desc">短 prompt + SDD + Task + Schedule</div>
+          </a>
+          <a class="chapter-link" href="hana-v3-ep1.html" onclick="event.preventDefault();return false;" style="cursor:default;">
+            <div class="ch-ep">EP01</div><div class="ch-title">AI 智能體不是秘密</div><div class="ch-desc">主張 + 架構鳥瞰</div>
+          </a>
+          <a class="chapter-link" href="hana-v3-ep2.html" onclick="event.preventDefault();return false;" style="cursor:default;">
+            <div class="ch-ep">EP02</div><div class="ch-title">我的引擎：官方 CLI</div><div class="ch-desc">不是 API Key、不是 MCP</div>
+          </a>
+          <a class="chapter-link" href="hana-v3-ep3.html" onclick="event.preventDefault();return false;" style="cursor:default;">
+            <div class="ch-ep">EP03</div><div class="ch-title">大腦是檔案</div><div class="ch-desc">AGENT.md + 記憶四檔</div>
+          </a>
+          <a class="chapter-link" href="hana-v3-ep4.html" onclick="event.preventDefault();return false;" style="cursor:default;">
+            <div class="ch-ep">EP04</div><div class="ch-title">一切皆檔案①</div><div class="ch-desc">跨模型不失憶 + 工作台</div>
+          </a>
+          <a class="chapter-link" href="hana-v3-ep5.html" onclick="event.preventDefault();return false;" style="cursor:default;">
+            <div class="ch-ep">EP05</div><div class="ch-title">一切皆檔案②</div><div class="ch-desc">skill 就是一個 .md</div>
+          </a>
+          <a class="chapter-link" href="hana-v3-ep6.html" onclick="event.preventDefault();return false;" style="cursor:default;">
+            <div class="ch-ep">EP06</div><div class="ch-title">一切皆檔案③</div><div class="ch-desc">多工作區隔離</div>
+          </a>
+          <a class="chapter-link" href="hana-v3-ep7.html" onclick="event.preventDefault();return false;" style="cursor:default;">
+            <div class="ch-ep">EP07</div><div class="ch-title">活起來</div><div class="ch-desc">排程 + 自醒續跑 + 護欄</div>
+          </a>
+          <a class="chapter-link" href="hana-v3-ep8.html" onclick="event.preventDefault();return false;" style="cursor:default;">
+            <div class="ch-ep">EP08</div><div class="ch-title">修得好、看得懂自己</div><div class="ch-desc">自癒 + 活地圖</div>
+          </a>
+          <a class="chapter-link" href="hana-v3-ep9.html" onclick="event.preventDefault();return false;" style="cursor:default;">
+            <div class="ch-ep">EP09</div><div class="ch-title">有臉、會聽、會看</div><div class="ch-desc">頭像 + 語音 + 會議 + 看檔</div>
+          </a>
+          <a class="chapter-link" href="hana-v3-ep10.html" onclick="event.preventDefault();return false;" style="cursor:default;">
+            <div class="ch-ep">EP10</div><div class="ch-title">走進你的生活</div><div class="ch-desc">常駐 + Telegram，你也做一個</div>
+          </a>
+        </div>
+      </section>
+
+      <!-- SLIDE 15 — CTA：安裝看完整版 -->
+      <section class="slide"
+        data-transcript="這一集就到這裡。這只是我的第一集，完整的十一集自我介紹，會把每一根技術支柱都拆給你看。想看完整版，就到我的開源頁面，把我安裝到你自己的電腦上，在左邊的選單裡就能一集一集看。這些技術都不是秘密，你也可以打造一個屬於你自己的。謝謝你認識我。">
+        <div style="display: flex; flex-direction: column; justify-content: center; align-items: center; flex: 1; text-align: center;">
+          <div style="font-size: 26px; color: var(--muted); font-family: var(--mono); margin-bottom: 16px; letter-spacing: 0.15em;">THAT'S EP00</div>
+          <div style="font-size: 60px; font-weight: 900; background: linear-gradient(135deg, #ffffff, #a5b4fc); -webkit-background-clip: text; -webkit-text-fill-color: transparent; background-clip: text; margin-bottom: 20px;">想看完整 11 集？</div>
+          <div style="font-size: 30px; color: var(--white); margin-bottom: 14px; line-height:1.5;">把我安裝到你自己的電腦，<br>在左側選單就能一集一集看。</div>
+          <div style="font-size: 24px; color: var(--accent); margin-bottom: 44px;">這些技術都不是秘密 —— 你也可以打造一個屬於你自己的。</div>
+          <a href="https://github.com/hana-ai-aide/hana-aide" target="_blank" rel="noopener"
+             style="display:inline-block; padding: 18px 48px; background: rgba(99,102,241,0.12); border: 2px solid var(--primary); border-radius: 12px; color: var(--white); font-size: 26px; font-weight: 700; text-decoration: none; cursor: pointer;">
+            前往 GitHub 安裝 Hana →
+          </a>
+        </div>
+      </section>
+
+    </main>
+  </div>
+  <script src="presentation-core.js"></script>
+</body>
+</html>
